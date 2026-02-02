@@ -1,0 +1,27 @@
+import sqlite3
+from datetime import datetime, timezone
+
+conn = sqlite3.connect("user_data.db")
+cursor = conn.cursor()
+
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    taskName TEXT NOT NULL,
+    start_time INTEGER,
+    end_time   INTEGER,
+    difficulty INTEGER,
+    category TEXT,
+    completed INTEGER,
+    repeatable INTEGER
+    
+)
+""")
+
+cur_time_in = int(datetime.now(timezone.utc).timestamp())
+print(cur_time_in)
+
+cursor.execute(f"""
+INSERT INTO users (taskName, start_time, end_time, difficulty, category, completed, repeatable) VALUES ('DoThis', {cur_time_in}, {cur_time_in + 3600}, 1, 'Sport', 1,0)""")
+conn.commit()
+conn.close()
