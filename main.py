@@ -5,9 +5,18 @@ import datetime
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication
 
+import AnimatedToggle
+
 mw = popup = None
+cur_main_ui = "v21.ui"
+cur_popup_ui = "add_task_popup_v6.ui"
+
 def check_connection():
     print('Hello, World!')
+
+def set_repeatable_menu():
+    global popup
+    popup.repeatable_widget.setVisible(popup.repeatable_toggle._checked)
 
 def submit():
     global popup
@@ -24,10 +33,12 @@ def submit():
     cursor.execute("""
     INSERT INTO users
     (user, taskName, start_time, end_time, difficulty, category, completed, repeatable)
-    VALUES (?,?,?,?,?,?,0,0)""",
-    ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,))
+    VALUES (?,?,?,?,?,?,?,?)""",
+    ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked))
     #conn.commit() <-----------IMPORTANT (off for test cases)
     global mw
+    mw.stackedWidget.setVisible(True)
+
     mw.stackedWidget.setCurrentIndex(0)
     mw.category_stack.setCurrentIndex(0)
     mw.difficulty_stack.setCurrentIndex(0)
@@ -44,9 +55,18 @@ def submit():
 def show_add_task_popup():
     global popup
 
-    popup = loader.load('add_task_popup_v5.ui', None)
+    popup = loader.load(cur_popup_ui, None)
+
+
+    #popup.setStretch(1,1,1,1,1,1,1,1)
+
+    popup.repeatable_widget.setVisible(False)
+    popup.repeatable_toggle = AnimatedToggle.AnimatedToggle(popup)
+    popup.repeatable_layout.replaceWidget(popup.rep_switch, popup.repeatable_toggle)
+    popup.repeatable_toggle.toggled.connect(set_repeatable_menu)
 
     popup.submit_button.clicked.connect(submit)
+
     popup.show()
 
 
@@ -57,8 +77,9 @@ cursor = conn.cursor()
 loader = QUiLoader()
 
 app = QApplication(sys.argv)
-mw = loader.load('v19.ui', None)
+mw = loader.load(cur_main_ui, None)
 
+mw.stackedWidget.setVisible(False)
 mw.tabWidget.setCurrentIndex(0)
 mw.add_task_button.clicked.connect(show_add_task_popup)
 

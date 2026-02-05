@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>781</height>
+    <width>1194</width>
+    <height>776</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -45,7 +45,7 @@ background-color: rgb(16,16,16);</string>
        <enum>QTabWidget::TabShape::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>false</bool>
@@ -178,8 +178,8 @@ QPushButton:checked {
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>368</width>
-               <height>588</height>
+               <width>436</width>
+               <height>551</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout"/>
@@ -193,6 +193,12 @@ QPushButton:checked {
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>75</height>
+             </size>
             </property>
             <property name="styleSheet">
              <string notr="true">background-color: rgb(40,40, 40);
@@ -232,7 +238,7 @@ border-radius: 15px;</string>
            </size>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page">
            <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -268,7 +274,7 @@ border-radius: 15px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>528</width>
+                 <width>630</width>
                  <height>1397</height>
                 </rect>
                </property>
@@ -694,7 +700,7 @@ QPushButton:checked {
                             </font>
                            </property>
                            <property name="text">
-                            <string>this is a task</string>
+                            <string/>
                            </property>
                           </widget>
                          </item>
@@ -777,6 +783,12 @@ QPushButton:checked {
                        <height>75</height>
                       </size>
                      </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>75</height>
+                      </size>
+                     </property>
                      <property name="font">
                       <font>
                        <pointsize>30</pointsize>
@@ -793,8 +805,7 @@ QPushButton:checked {
                     </widget>
                    </item>
                    <item>
-                    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,1,1,1">
-                    </layout>
+                    <layout class="QVBoxLayout" name="verticalLayout_3"/>
                    </item>
                    <item>
                     <widget class="QProgressBar" name="task_step_progress">
@@ -808,6 +819,12 @@ QPushButton:checked {
                       <size>
                        <width>0</width>
                        <height>40</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>50</height>
                       </size>
                      </property>
                      <property name="styleSheet">
@@ -826,7 +843,7 @@ QProgressBar::chunk {
 </string>
                      </property>
                      <property name="value">
-                      <number>24</number>
+                      <number>0</number>
                      </property>
                      <property name="textVisible">
                       <bool>false</bool>
@@ -845,6 +862,12 @@ QProgressBar::chunk {
                       <size>
                        <width>0</width>
                        <height>40</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>75</height>
                       </size>
                      </property>
                      <property name="text">
@@ -939,7 +962,7 @@ QProgressBar::chunk {
                         </font>
                        </property>
                        <property name="text">
-                        <string>3</string>
+                        <string>0</string>
                        </property>
                        <property name="alignment">
                         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1005,7 +1028,7 @@ QProgressBar::chunk {
                         </font>
                        </property>
                        <property name="text">
-                        <string>7</string>
+                        <string>0</string>
                        </property>
                        <property name="alignment">
                         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -1370,7 +1393,7 @@ QProgressBar::chunk {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>925</width>
+             <width>1095</width>
              <height>1696</height>
             </rect>
            </property>
@@ -1616,8 +1639,8 @@ border-radius: 15px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>950</width>
-             <height>698</height>
+             <width>1120</width>
+             <height>693</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_28">
@@ -2054,8 +2077,8 @@ border-radius: 100px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>302</width>
-                 <height>327</height>
+                 <width>363</width>
+                 <height>325</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_27"/>
@@ -2327,8 +2350,8 @@ border-radius: 15px;
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>616</width>
-                  <height>193</height>
+                  <width>725</width>
+                  <height>191</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_2"/>
@@ -2463,7 +2486,7 @@ border-radius: 15px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1024</width>
+     <width>1194</width>
      <height>30</height>
     </rect>
    </property>
