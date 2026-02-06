@@ -790,7 +790,7 @@ border-radius: 25px;</string>
        </item>
        <item>
         <property name="text">
-         <string>hard</string>
+         <string>Hard</string>
         </property>
        </item>
       </widget>

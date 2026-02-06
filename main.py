@@ -2,17 +2,95 @@ import sqlite3
 import sys
 import datetime
 
+from PySide6.QtGui import QIcon, Qt
+from PySide6.QtCore import QEvent, QObject
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QWidget
 
 import AnimatedToggle
 
+tasks = {}
+diff_col = {
+'Easy' : 'green',
+'Medium' : 'yellow',
+'Hard' : 'red',
+'Free' : 'blue'
+}
+palette = {
+'red' : 'rgb(211, 0, 0)',
+'yellow' :'rgb(209, 167, 0)',
+'gold' : 'rgb(214, 150, 0)',
+'green' : 'rgb(49, 255, 34)',
+'blue' : 'rgb(0, 179, 255)',
+'gray' : 'rgb(40,40, 40)',
+'black' :'rgb(16,16,16)'
+}
+
+icons = {
+'Chores' : 'brush-cleaning(3).svg',
+'Sport' : 'dumbbell.svg',
+'Education' : 'graduation-cap.svg',
+'Job' : 'hand-coins.svg',
+'Meal' : 'utensils-crossed.svg'
+}
 mw = popup = None
-cur_main_ui = "v21.ui"
-cur_popup_ui = "add_task_popup_v6.ui"
+
+task_widget_ui = "task_v3.ui"
+main_ui = "v22.ui"
+popup_ui = "add_task_popup_v6.ui"
+
+
+class Task(QWidget):
+    def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
+        super().__init__()
+        global mw
+
+        self.name = name
+        self.description = description
+        self.difficulty = difficulty
+        self.category = category
+
+        self.task = loader.load(task_widget_ui,parent)
+
+        self.task.setMaximumHeight(120)
+        self.task.task_name_8.setText(name)
+        if description == '':
+            self.task.task_description_8.setVisible(False)
+        else:
+            self.task.task_description_8.setText(description)
+        self.task.toolButton_2.setIcon(QIcon(f"icons_white/{icons[category]}"))
+        bg_color = palette[diff_col[difficulty]]
+        self.task.setStyleSheet(f"""background-color: {bg_color}; border-radius: 20px;""")
+
+        self.task.setMouseTracking(True)
+        self.task.setAttribute(Qt.WA_StyledBackground, True)
+
+
+        self.task.installEventFilter(self)
+        parent.layout().addWidget(self.task)
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.MouseButtonPress:
+            set_task_info(self.name, self.description, self.difficulty, self.category)
+
+
 
 def check_connection():
     print('Hello, World!')
+
+def set_task_info(task_name, task_description, task_difficulty, task_category):
+    global mw
+    mw.stackedWidget.setVisible(True)
+
+    mw.stackedWidget.setCurrentIndex(0)
+    mw.category_stack.setCurrentIndex(0)
+    mw.difficulty_stack.setCurrentIndex(0)
+    mw.description_label_edit_layout.setCurrentIndex(0)
+
+    mw.task_name_label.setText(task_name)
+    mw.category.setText(task_category)
+    mw.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
+    mw.description_input_label.setText(task_description)
 
 def set_repeatable_menu():
     global popup
@@ -36,27 +114,21 @@ def submit():
     VALUES (?,?,?,?,?,?,?,?)""",
     ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked))
     #conn.commit() <-----------IMPORTANT (off for test cases)
-    global mw
-    mw.stackedWidget.setVisible(True)
 
-    mw.stackedWidget.setCurrentIndex(0)
-    mw.category_stack.setCurrentIndex(0)
-    mw.difficulty_stack.setCurrentIndex(0)
-    mw.description_label_edit_layout_2.setCurrentIndex(0) #rename
+    set_task_info(_task_name, _task_description, _task_difficulty, _task_category)
 
-    mw.task_name_label.setText(_task_name)
-    mw.category.setText(_task_category)
-    mw.difficulty.setText(_task_difficulty) # RENAME THEIR LABELS
-    mw.description_input_label_2.setText(_task_description) #rename
+    task = Task(_task_name, _task_description, _task_difficulty, _task_category, popup.repeatable_toggle._checked, parent=mw.tasks_scrollwidget)
+
+    tasks[_task_name] = task
 
     popup.close()
     popup = None
     #add repeatable
+
 def show_add_task_popup():
     global popup
 
-    popup = loader.load(cur_popup_ui, None)
-
+    popup = loader.load(popup_ui, None)
 
     #popup.setStretch(1,1,1,1,1,1,1,1)
 
@@ -70,14 +142,13 @@ def show_add_task_popup():
     popup.show()
 
 
-
 conn = sqlite3.connect('user_data.db')
 cursor = conn.cursor()
 
 loader = QUiLoader()
 
 app = QApplication(sys.argv)
-mw = loader.load(cur_main_ui, None)
+mw = loader.load(main_ui, None)
 
 mw.stackedWidget.setVisible(False)
 mw.tabWidget.setCurrentIndex(0)
