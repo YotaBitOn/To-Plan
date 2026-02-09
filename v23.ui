@@ -45,7 +45,7 @@ background-color: rgb(16,16,16);</string>
        <enum>QTabWidget::TabShape::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <property name="documentMode">
        <bool>false</bool>
@@ -273,7 +273,7 @@ border-radius: 15px;</string>
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>0</y>
+                 <y>-396</y>
                  <width>635</width>
                  <height>1517</height>
                 </rect>
@@ -784,7 +784,7 @@ QPushButton:checked {
 border-radius: 40px;
 </string>
                   </property>
-                  <widget class="QWidget" name="steps_stackedWidgetPage1" native="true">
+                  <widget class="QWidget" name="steps_stackedWidgetPage1">
                    <layout class="QVBoxLayout" name="verticalLayout_2">
                     <property name="spacing">
                      <number>6</number>
@@ -841,7 +841,9 @@ border-radius: 40px;
                      </layout>
                     </item>
                     <item>
-                     <layout class="QVBoxLayout" name="verticalLayout_3"/>
+                     <widget class="QWidget" name="task_steps_layout" native="true">
+                      <layout class="QVBoxLayout" name="verticalLayout_3"/>
+                     </widget>
                     </item>
                     <item>
                      <spacer name="verticalSpacer">

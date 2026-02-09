@@ -35,19 +35,32 @@ icons = {
 }
 mw = popup = None
 cur_task = None
+pages_ammo = 0
 
 task_widget_ui = "task_v4.ui"
 main_ui = "v23.ui"
 popup_ui = "add_task_popup_v6.ui"
-task_step_ui = 'task_step.ui'
+task_step_ui = 'task_step_v3.ui'
 class TaskStep(QWidget):
-    def __init__(self):
-        super.__init__()
+    def __init__(self, parent= None):
+        super().__init__()
+        global mw
 
-        self.taskstep = loader.load(task_step_ui, mw.verticalLayout_3)
+        self.taskstep = loader.load(task_step_ui, parent)
+        self.taskstep.raise_()
+        self.taskstep.stackedWidget.setCurrentIndex(1)
+        self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {palette['black']};""")
+
+        self.taskstep.task_step_apply.clicked.connect(lambda : self.confirm_name())
+        #parent.layout().addWidget(self.taskstep)
 
 
+    def confirm_name(self):
 
+        self.name = self.taskstep.lineEdit.text()
+
+        self.taskstep.stackedWidget.setCurrentIndex(0)
+        self.taskstep.task_step_label.setText(self.name)
 class Task(QWidget):
     def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
         super().__init__()
@@ -111,7 +124,7 @@ def set_repeatable_menu():
     popup.repeatable_widget.setVisible(popup.repeatable_toggle._checked)
 
 def submit():
-    global popup
+    global popup, pages_ammo
     _task_name = popup.name_edit.text()
     _task_description = popup.description_edit.toPlainText()
     _task_due = str(popup.timeEdit.time())
@@ -133,7 +146,8 @@ def submit():
 
     task = Task(_task_name, _task_description, _task_difficulty, _task_category, popup.repeatable_toggle._checked, parent=mw.tasks_scrollwidget)
 
-    tasks[_task_name] = task
+    tasks[_task_name] = [task,[],pages_ammo]
+    pages_ammo+=1
 
     popup.close()
     popup = None
@@ -156,7 +170,11 @@ def show_add_task_popup():
     popup.show()
 
 def add_task_step():
-    task_step = TaskStep()
+    task_step = TaskStep(parent=mw.task_steps_layout) # rename to widget
+    mw.task_steps_layout.layout().addWidget(task_step.taskstep)
+
+    tasks[cur_task][1].append(task_step)
+
 
 conn = sqlite3.connect('user_data.db')
 cursor = conn.cursor()
@@ -169,7 +187,7 @@ mw = loader.load(main_ui, None)
 mw.stackedWidget.setVisible(False)
 mw.tabWidget.setCurrentIndex(0)
 mw.add_task_button.clicked.connect(show_add_task_popup)
-mw.add_task_step_buttonclicked.connect(add_task_step)
+mw.add_task_step_button.clicked.connect(add_task_step)
 
 mw.show()
 app.exec()
