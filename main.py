@@ -34,17 +34,26 @@ icons = {
 'Meal' : 'utensils-crossed.svg'
 }
 mw = popup = None
+cur_task = None
 
-task_widget_ui = "task_v3.ui"
-main_ui = "v22.ui"
+task_widget_ui = "task_v4.ui"
+main_ui = "v23.ui"
 popup_ui = "add_task_popup_v6.ui"
+task_step_ui = 'task_step.ui'
+class TaskStep(QWidget):
+    def __init__(self):
+        super.__init__()
+
+        self.taskstep = loader.load(task_step_ui, mw.verticalLayout_3)
+
 
 
 class Task(QWidget):
     def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
         super().__init__()
-        global mw
+        global mw, cur_task
 
+        cur_task = name
         self.name = name
         self.description = description
         self.difficulty = difficulty
@@ -79,7 +88,10 @@ def check_connection():
     print('Hello, World!')
 
 def set_task_info(task_name, task_description, task_difficulty, task_category):
-    global mw
+    global mw, cur_task
+
+    cur_task = task_name
+
     mw.stackedWidget.setVisible(True)
 
     mw.stackedWidget.setCurrentIndex(0)
@@ -91,6 +103,8 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.category.setText(task_category)
     mw.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
     mw.description_input_label.setText(task_description)
+
+    mw.steps_label.setText(f'{task_name} steps')
 
 def set_repeatable_menu():
     global popup
@@ -141,6 +155,8 @@ def show_add_task_popup():
 
     popup.show()
 
+def add_task_step():
+    task_step = TaskStep()
 
 conn = sqlite3.connect('user_data.db')
 cursor = conn.cursor()
@@ -153,6 +169,7 @@ mw = loader.load(main_ui, None)
 mw.stackedWidget.setVisible(False)
 mw.tabWidget.setCurrentIndex(0)
 mw.add_task_button.clicked.connect(show_add_task_popup)
+mw.add_task_step_buttonclicked.connect(add_task_step)
 
 mw.show()
 app.exec()
