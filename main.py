@@ -5,7 +5,7 @@ import datetime
 from PySide6.QtGui import QIcon, Qt
 from PySide6.QtCore import QEvent, QObject
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout
 
 import AnimatedToggle
 
@@ -35,32 +35,31 @@ icons = {
 }
 mw = popup = None
 cur_task = None
-pages_ammo = 0
+task_ammo = 0
 
 task_widget_ui = "task_v4.ui"
 main_ui = "v23.ui"
 popup_ui = "add_task_popup_v6.ui"
 task_step_ui = 'task_step_v3.ui'
+
 class TaskStep(QWidget):
-    def __init__(self, parent= None):
+    def __init__(self, parent=None):
         super().__init__()
         global mw
 
-        self.taskstep = loader.load(task_step_ui, parent)
-        self.taskstep.raise_()
+        self.taskstep = loader.load(task_step_ui, self)
+        #self.taskstep.raise_()
         self.taskstep.stackedWidget.setCurrentIndex(1)
         self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {palette['black']};""")
 
         self.taskstep.task_step_apply.clicked.connect(lambda : self.confirm_name())
-        #parent.layout().addWidget(self.taskstep)
-
 
     def confirm_name(self):
-
         self.name = self.taskstep.lineEdit.text()
 
         self.taskstep.stackedWidget.setCurrentIndex(0)
         self.taskstep.task_step_label.setText(self.name)
+
 class Task(QWidget):
     def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
         super().__init__()
@@ -89,12 +88,12 @@ class Task(QWidget):
 
 
         self.task.installEventFilter(self)
+        self.task.task_check_4.clicked.connect(complete_task)
         parent.layout().addWidget(self.task)
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
             set_task_info(self.name, self.description, self.difficulty, self.category)
-
 
 
 def check_connection():
@@ -117,24 +116,42 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
     mw.description_input_label.setText(task_description)
 
+    if tasks[cur_task]['Completed']:
+        mw.pushButton.setIcon(QIcon('icons_white/circle-check-big.svg'))
+    else:
+        mw.pushButton.setIcon(QIcon('icons_white/circle.svg'))
+
     mw.steps_label.setText(f'{task_name} steps')
+
+    if tasks[task_name]['taskNo'] not in range(mw.stackedWidget_2.count()):
+        task_step_page = QWidget()
+        task_step_page_layout = QVBoxLayout(task_step_page)
+        tasks[task_name]['taskStepsPage'] = task_step_page
+
+        mw.stackedWidget_2.addWidget(task_step_page)
+
+    mw.stackedWidget_2.setCurrentIndex(tasks[task_name]['taskNo'])
+    print(tasks[task_name]['taskNo'],'<==>', mw.stackedWidget_2.currentIndex(), '/', mw.stackedWidget_2.count()-1)
 
 def set_repeatable_menu():
     global popup
     popup.repeatable_widget.setVisible(popup.repeatable_toggle._checked)
 
 def submit():
-    global popup, pages_ammo
+    global popup, task_ammo
     _task_name = popup.name_edit.text()
+    if _task_name == '':
+        _task_name = f"Task #{task_ammo}"
+
     _task_description = popup.description_edit.toPlainText()
     _task_due = str(popup.timeEdit.time())
-    print(_task_due)
     _task_difficulty = popup.diff_box.currentText()
     _task_category= popup.difficulty_combobox.currentText() # rename it pls
 
     #change user
     start_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     end_time = datetime.datetime.now().strftime('%Y-%m-%d') + _task_due #change with adding repeatable
+
     cursor.execute("""
     INSERT INTO users
     (user, taskName, start_time, end_time, difficulty, category, completed, repeatable)
@@ -142,12 +159,15 @@ def submit():
     ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked))
     #conn.commit() <-----------IMPORTANT (off for test cases)
 
+    task = Task(_task_name, _task_description, _task_difficulty, _task_category, popup.repeatable_toggle._checked,parent=mw.tasks_scrollwidget)
+    tasks[_task_name] = {'taskWidget': task, 'taskNo': task_ammo, 'taskSteps': [], 'taskStepsPage': None, 'Completed':False}
     set_task_info(_task_name, _task_description, _task_difficulty, _task_category)
 
-    task = Task(_task_name, _task_description, _task_difficulty, _task_category, popup.repeatable_toggle._checked, parent=mw.tasks_scrollwidget)
 
-    tasks[_task_name] = [task,[],pages_ammo]
-    pages_ammo+=1
+
+
+    task_ammo+=1
+
 
     popup.close()
     popup = None
@@ -170,11 +190,34 @@ def show_add_task_popup():
     popup.show()
 
 def add_task_step():
-    task_step = TaskStep(parent=mw.task_steps_layout) # rename to widget
-    mw.task_steps_layout.layout().addWidget(task_step.taskstep)
+    #mw.task_step_progress.setVisible(True)
+    global mw
+    print('wow')
 
-    tasks[cur_task][1].append(task_step)
+    #mw.stackedWidget_2.setVisible(True)
+    print(cur_task)
+    print(mw.stackedWidget_2.currentIndex(), '/', mw.stackedWidget_2.count()-1)
 
+    task_page = tasks[cur_task]['taskStepsPage']
+    print(task_page)
+    task_page_layout = task_page.layout()
+    task_step = TaskStep(parent=task_page)
+    task_page_layout.addWidget(task_step.taskstep)
+
+    tasks[cur_task]['taskSteps'].append(task_step)
+
+def complete_task():
+    global mw
+    tasks[cur_task]['Completed'] = not tasks[cur_task]['Completed']
+
+
+    if tasks[cur_task]['Completed']:
+        mw.pushButton.setIcon(QIcon('icons_white/circle-check-big.svg'))
+        tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle-check-big.svg'))
+
+    else:
+        mw.pushButton.setIcon(QIcon('icons_white/circle.svg'))
+        tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
 
 conn = sqlite3.connect('user_data.db')
 cursor = conn.cursor()
@@ -184,10 +227,13 @@ loader = QUiLoader()
 app = QApplication(sys.argv)
 mw = loader.load(main_ui, None)
 
+mw.task_step_progress.setVisible(False)
+#mw.stackedWidget_2.setVisible(False)
 mw.stackedWidget.setVisible(False)
 mw.tabWidget.setCurrentIndex(0)
+
 mw.add_task_button.clicked.connect(show_add_task_popup)
 mw.add_task_step_button.clicked.connect(add_task_step)
-
+mw.pushButton.clicked.connect(complete_task)
 mw.show()
 app.exec()
