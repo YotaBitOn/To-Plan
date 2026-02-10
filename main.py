@@ -41,18 +41,20 @@ task_widget_ui = "task_v4.ui"
 main_ui = "v23.ui"
 popup_ui = "add_task_popup_v6.ui"
 task_step_ui = 'task_step_v3.ui'
-
+#cursor
 class TaskStep(QWidget):
     def __init__(self, parent=None):
         super().__init__()
         global mw
 
         self.taskstep = loader.load(task_step_ui, self)
+        self.completed = False
         #self.taskstep.raise_()
         self.taskstep.stackedWidget.setCurrentIndex(1)
         self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {palette['black']};""")
 
         self.taskstep.task_step_apply.clicked.connect(lambda : self.confirm_name())
+        self.taskstep.task_step_check.clicked.connect(lambda : self.toggle_complete())
 
     def confirm_name(self):
         self.name = self.taskstep.lineEdit.text()
@@ -60,6 +62,23 @@ class TaskStep(QWidget):
         self.taskstep.stackedWidget.setCurrentIndex(0)
         self.taskstep.task_step_label.setText(self.name)
 
+    def toggle_complete(self):
+        self.completed = not self.completed
+
+        if self.completed:
+            self.taskstep.task_step_check.setIcon(QIcon('icons_white/circle-check-big.svg'))
+        else:
+            self.taskstep.task_step_check.setIcon(QIcon('icons_white/circle.svg'))
+
+        #print(tasks)
+
+        tasks[cur_task]['taskSteps'][self] = self.completed
+
+        #progress = ( sum(tasks[cur_task]['taskSteps'].values) // len(tasks[cur_task]['taskSteps']) ) * 100
+        progress = (sum(tasks[cur_task]['taskSteps'].values()) / len(tasks[cur_task]['taskSteps'])) * 100
+        tasks[cur_task]['progress'] = round(progress, 1)
+        mw.task_step_progress.setValue(tasks[cur_task]['progress'])
+        #print(tasks)
 class Task(QWidget):
     def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
         super().__init__()
@@ -116,6 +135,13 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
     mw.description_input_label.setText(task_description)
 
+    if len(tasks[cur_task]['taskSteps']) == 0:
+        mw.task_step_progress.setVisible(False)
+        mw.task_step_progress.setValue(0)
+    else:
+        mw.task_step_progress.setValue(tasks[cur_task]['progress'])
+        mw.task_step_progress.setVisible(True)
+
     if tasks[cur_task]['Completed']:
         mw.pushButton.setIcon(QIcon('icons_white/circle-check-big.svg'))
     else:
@@ -154,13 +180,13 @@ def submit():
 
     cursor.execute("""
     INSERT INTO users
-    (user, taskName, start_time, end_time, difficulty, category, completed, repeatable)
-    VALUES (?,?,?,?,?,?,?,?)""",
-    ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked))
-    #conn.commit() <-----------IMPORTANT (off for test cases)
+    (user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps)
+    VALUES (?,?,?,?,?,?,?,?,?)""",
+    ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked,0,''))
+    conn.commit() #<-----------IMPORTANT (off for test cases)
 
     task = Task(_task_name, _task_description, _task_difficulty, _task_category, popup.repeatable_toggle._checked,parent=mw.tasks_scrollwidget)
-    tasks[_task_name] = {'taskWidget': task, 'taskNo': task_ammo, 'taskSteps': [], 'taskStepsPage': None, 'Completed':False}
+    tasks[_task_name] = {'taskWidget': task, 'taskNo': task_ammo, 'taskSteps': {}, 'taskStepsPage': None, 'Completed':False}
     set_task_info(_task_name, _task_description, _task_difficulty, _task_category)
 
 
@@ -190,31 +216,29 @@ def show_add_task_popup():
     popup.show()
 
 def add_task_step():
-    #mw.task_step_progress.setVisible(True)
     global mw
-    print('wow')
 
     #mw.stackedWidget_2.setVisible(True)
-    print(cur_task)
-    print(mw.stackedWidget_2.currentIndex(), '/', mw.stackedWidget_2.count()-1)
+    mw.task_step_progress.setVisible(True)
 
     task_page = tasks[cur_task]['taskStepsPage']
-    print(task_page)
     task_page_layout = task_page.layout()
     task_step = TaskStep(parent=task_page)
     task_page_layout.addWidget(task_step.taskstep)
 
-    tasks[cur_task]['taskSteps'].append(task_step)
+    tasks[cur_task]['taskSteps'][task_step] = False
 
+    progress = (sum(tasks[cur_task]['taskSteps'].values()) / len(tasks[cur_task]['taskSteps'])) * 100
+    tasks[cur_task]['progress'] = round(progress, 1)
+    mw.task_step_progress.setValue(tasks[cur_task]['progress'])
+    #tasks[cur_task]['progress'] = 0
 def complete_task():
     global mw
     tasks[cur_task]['Completed'] = not tasks[cur_task]['Completed']
 
-
     if tasks[cur_task]['Completed']:
         mw.pushButton.setIcon(QIcon('icons_white/circle-check-big.svg'))
         tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle-check-big.svg'))
-
     else:
         mw.pushButton.setIcon(QIcon('icons_white/circle.svg'))
         tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
