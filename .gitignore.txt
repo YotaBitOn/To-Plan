@@ -1,2 +1,0 @@
-temp.py
-user-data.db-journal
