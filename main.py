@@ -55,7 +55,8 @@ class TaskStep(QWidget):
 
         self.taskstep.task_step_apply.clicked.connect(lambda : self.confirm_name())
         self.taskstep.task_step_check.clicked.connect(lambda : self.toggle_complete())
-
+        self.taskstep.task_step_edit.clicked.connect(lambda : self.edit_name())
+        self.taskstep.task_step_delete.clicked.connect(lambda : self.deconstruct())
     def confirm_name(self):
         self.name = self.taskstep.lineEdit.text()
 
@@ -79,6 +80,14 @@ class TaskStep(QWidget):
         tasks[cur_task]['progress'] = round(progress, 1)
         mw.task_step_progress.setValue(tasks[cur_task]['progress'])
         #print(tasks)
+
+    def edit_name(self):
+        self.taskstep.stackedWidget.setCurrentIndex(1)
+
+    def deconstruct(self):
+        self.taskstep.deleteLater()
+        del self
+
 class Task(QWidget):
     def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
         super().__init__()
@@ -113,6 +122,7 @@ class Task(QWidget):
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
             set_task_info(self.name, self.description, self.difficulty, self.category)
+
 
 
 def check_connection():
@@ -181,7 +191,7 @@ def submit():
     cursor.execute("""
     INSERT INTO users
     (user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps)
-    VALUES (?,?,?,?,?,?,?,?,?)""",
+    VALUES (?,?,?,?,?,?,?,?,?,?)""",
     ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked,0,''))
     conn.commit() #<-----------IMPORTANT (off for test cases)
 
