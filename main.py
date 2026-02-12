@@ -3,13 +3,29 @@ import sys
 import datetime
 
 from PySide6.QtGui import QIcon, Qt
-from PySide6.QtCore import QEvent, QObject
+from PySide6.QtCore import QEvent, QObject, QDate, QDateTime
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout
 
 import AnimatedToggle
 
-tasks = {}
+#moveit to .env
+user = 'Yasinets'
+
+mounth_number = {
+'January' : 1,
+'February' : 2,
+'March' : 3,
+'April' : 4,
+'May' : 5,
+'June' : 6,
+'July' : 7,
+'August' : 8,
+'September' : 9,
+'October' : 10,
+'November' : 11,
+'December' : 12,
+}
 diff_col = {
 'Easy' : 'green',
 'Medium' : 'yellow',
@@ -22,10 +38,10 @@ palette = {
 'gold' : 'rgb(214, 150, 0)',
 'green' : 'rgb(49, 255, 34)',
 'blue' : 'rgb(0, 179, 255)',
+'light-gray' : 'rgb(65, 65, 65)',
 'gray' : 'rgb(40,40, 40)',
 'black' :'rgb(16,16,16)'
 }
-
 icons = {
 'Chores' : 'brush-cleaning(3).svg',
 'Sport' : 'dumbbell.svg',
@@ -33,15 +49,17 @@ icons = {
 'Job' : 'hand-coins.svg',
 'Meal' : 'utensils-crossed.svg'
 }
-mw = popup = None
+
 cur_task = None
 task_ammo = 0
+tasks = {}
 
+mw = popup = None
 task_widget_ui = "task_v4.ui"
 main_ui = "v25.ui"
 popup_ui = "add_task_popup_v6.ui"
 task_step_ui = 'task_step_v3.ui'
-#cursor
+
 class TaskStep(QWidget):
     def __init__(self, parent=None):
         super().__init__()
@@ -49,7 +67,6 @@ class TaskStep(QWidget):
 
         self.taskstep = loader.load(task_step_ui, self)
         self.completed = False
-        #self.taskstep.raise_()
         self.taskstep.stackedWidget.setCurrentIndex(1)
         self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {palette['black']};""")
 
@@ -57,6 +74,7 @@ class TaskStep(QWidget):
         self.taskstep.task_step_check.clicked.connect(lambda : self.toggle_complete())
         self.taskstep.task_step_edit.clicked.connect(lambda : self.edit_name())
         self.taskstep.task_step_delete.clicked.connect(lambda : self.deconstruct())
+
     def confirm_name(self):
         self.name = self.taskstep.lineEdit.text()
 
@@ -71,16 +89,9 @@ class TaskStep(QWidget):
         else:
             self.taskstep.task_step_check.setIcon(QIcon('icons_white/circle.svg'))
 
-        #print(tasks)
-
         tasks[cur_task]['taskSteps'][self] = self.completed
 
-        #progress = ( sum(tasks[cur_task]['taskSteps'].values) // len(tasks[cur_task]['taskSteps']) ) * 100
         update_progress_bar()
-        #progress = (sum(tasks[cur_task]['taskSteps'].values()) / len(tasks[cur_task]['taskSteps'])) * 100
-        #tasks[cur_task]['progress'] = round(progress, 1)
-        #mw.task_step_progress.setValue(tasks[cur_task]['progress'])
-        #print(tasks)
 
     def edit_name(self):
         self.taskstep.stackedWidget.setCurrentIndex(1)
@@ -88,6 +99,7 @@ class TaskStep(QWidget):
     def deconstruct(self):
         self.taskstep.deleteLater()
         del tasks[cur_task]['taskSteps'][self]
+
         update_progress_bar()
         del self
 
@@ -128,7 +140,6 @@ class Task(QWidget):
             set_task_info(self.name, self.description, self.difficulty, self.category)
 
 
-
 def check_connection():
     print('Hello, World!')
 
@@ -149,12 +160,23 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
     mw.description_input_label.setText(task_description)
 
+    if tasks[cur_task]['nextOccurrence']:
+        mw.repeatable_widget.setVisible(True)
+        mw.task_graphs_widget.setVisible(True)
+
+        next_occurrence_date =  datetime.datetime.fromtimestamp(tasks[cur_task]['nextOccurrence']).strftime("%d.%m.%Y")
+        next_occurrence_time =  datetime.datetime.fromtimestamp(tasks[cur_task]['nextOccurrence']).strftime("%H:%M")
+
+        mw.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+    else:
+        mw.repeatable_widget.setVisible(False)
+        mw.task_graphs_widget.setVisible(False)
+
     if len(tasks[cur_task]['taskSteps']) == 0:
         mw.task_step_progress.setVisible(False)
         mw.task_step_progress.setValue(0)
     else:
         update_progress_bar()
-        #mw.task_step_progress.setValue(tasks[cur_task]['progress'])
         mw.task_step_progress.setVisible(True)
 
     if tasks[cur_task]['Completed']:
@@ -162,18 +184,14 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     else:
         mw.task_complete_button.setIcon(QIcon('icons_white/circle.svg'))
 
-    mw.steps_label.setText(f'{task_name} steps')
-
     if tasks[task_name]['taskNo'] not in range(mw.steps_stack.count()):
-        print('1')
         task_step_page = QWidget()
         task_step_page_layout = QVBoxLayout(task_step_page)
         tasks[task_name]['taskStepsPage'] = task_step_page
 
         mw.steps_stack.addWidget(task_step_page)
-
+    mw.steps_label.setText(f'{task_name} steps')
     mw.steps_stack.setCurrentIndex(tasks[task_name]['taskNo'])
-    print(tasks[task_name]['taskNo'],'<==>', mw.steps_stack.currentIndex(), '/', mw.steps_stack.count()-1)
 
 def set_repeatable_menu():
     global popup
@@ -186,30 +204,36 @@ def submit():
         _task_name = f"Task #{task_ammo}"
 
     _task_description = popup.description_edit.toPlainText()
-    _task_due = str(popup.timeEdit.time())
     _task_difficulty = popup.diff_box.currentText()
     _task_category= popup.difficulty_combobox.currentText() # rename it pls
 
-    #change user
-    start_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-    end_time = datetime.datetime.now().strftime('%Y-%m-%d') + _task_due #change with adding repeatable
+    start_time = popup.at_timeedit.time()
+    end_time = popup.timeEdit.time()
+    cur_date = QDate.currentDate()
+    start_time = QDateTime(cur_date, start_time).toSecsSinceEpoch()
+    end_time = QDateTime(cur_date, end_time).toSecsSinceEpoch()
+
+    cur_time_in = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+    next_occurrence = None
+    if popup.repeatable_toggle._checked:
+        next_occurrence = (calculate_next_occurrence(
+            popup.every_box.currentText(),
+            popup.at_timeedit.time(),
+        ))
 
     cursor.execute("""
     INSERT INTO users
     (user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps)
     VALUES (?,?,?,?,?,?,?,?,?,?)""",
-    ('Yasinets',_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked,0,''))
+    (user,_task_name,start_time,end_time,_task_difficulty,_task_category,0,popup.repeatable_toggle._checked,next_occurrence,''))
     conn.commit() #<-----------IMPORTANT (off for test cases)
 
     task = Task(_task_name, _task_description, _task_difficulty, _task_category, popup.repeatable_toggle._checked,parent=mw.tasks_scrollwidget)
-    tasks[_task_name] = {'taskWidget': task, 'taskNo': task_ammo, 'taskSteps': {}, 'taskStepsPage': None, 'Completed':False}
+    tasks[_task_name] = {'taskWidget': task, 'taskNo': task_ammo, 'taskSteps': {}, 'taskStepsPage': None, 'Completed':False, 'nextOccurrence': next_occurrence}
+
     set_task_info(_task_name, _task_description, _task_difficulty, _task_category)
 
-
-
-
     task_ammo+=1
-
 
     popup.close()
     popup = None
@@ -223,17 +247,38 @@ def show_add_task_popup():
     #popup.setStretch(1,1,1,1,1,1,1,1)
 
     popup.repeatable_widget.setVisible(False)
+    popup.every_stack.setCurrentWidget(popup.day)
+    popup.every_stack.setVisible(False)
+
     popup.repeatable_toggle = AnimatedToggle.AnimatedToggle(popup)
     popup.repeatable_layout.replaceWidget(popup.rep_switch, popup.repeatable_toggle)
     popup.repeatable_toggle.toggled.connect(set_repeatable_menu)
 
     popup.submit_button.clicked.connect(submit)
 
+    popup.every_box.currentTextChanged.connect(set_every_stack)
+
     popup.show()
 
-def add_task_step():
-    global mw
+def set_every_stack():
+    cur_option = popup.every_box.currentText()
 
+    popup.every_stack.setVisible(True)
+    if cur_option == 'Few Days':
+        popup.every_stack.setCurrentWidget(popup.few_days)
+    elif cur_option == 'Week':
+        popup.every_stack.setCurrentWidget(popup.week)
+    elif cur_option == 'Mounth':
+        popup.every_stack.setCurrentWidget(popup.mounth)
+    elif cur_option == 'Year':
+        popup.every_stack.setCurrentWidget(popup.year)
+    elif cur_option == 'Day':
+        popup.every_stack.setCurrentWidget(popup.day)
+        popup.every_stack.setVisible(False)
+
+    print('p')
+
+def add_task_step():
     #mw.steps_stack.setVisible(True)
     mw.task_step_progress.setVisible(True)
 
@@ -246,6 +291,44 @@ def add_task_step():
 
     update_progress_bar()
     #tasks[cur_task]['progress'] = 0
+
+def calculate_next_occurrence(rep_type, at_time):
+    cur_date = QDate.currentDate()
+    if rep_type == 'Few Days':
+
+        cur_datetime_stamp = QDateTime(cur_date, at_time).toSecsSinceEpoch()
+
+        value = int(popup.few_days_edit.text())
+        next_occurrence = cur_datetime_stamp + 86400 * value
+
+    elif rep_type == 'Week':
+        pass#gonnado later
+
+    elif rep_type == 'Mounth':
+        cur_mounth = QDate(cur_date.year(), cur_date.month(), 1)
+        cur_mounth_stamp = QDateTime(cur_mounth, at_time).toSecsSinceEpoch()
+
+        value = int(popup.day_edit_2.text())
+
+        next_occurrence = cur_mounth_stamp + 86400 * value
+    elif rep_type == 'Year':
+
+        cur_year = QDate(cur_date.year(), 1, 1)
+        cur_year_stamp = QDateTime(cur_year, at_time).toSecsSinceEpoch()
+
+
+        day_value = int(popup.day_edit.text())
+        mounth_value = mounth_number[popup.mounth_edit.currentText()]
+
+        req_date = QDate(cur_date.year()+1, day_value, mounth_value)
+
+        next_occurrence = cur_year_stamp + 86400 * cur_year.daysTo(req_date)
+
+    elif rep_type == 'Day':
+        cur_datetime = QDateTime(cur_date, at_time).toSecsSinceEpoch()
+        next_occurrence = cur_datetime + 86400
+
+    return next_occurrence
 def update_progress_bar():
     global mw
     progress = (sum(tasks[cur_task]['taskSteps'].values()) / len(tasks[cur_task]['taskSteps'])) * 100
