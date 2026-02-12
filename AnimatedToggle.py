@@ -18,6 +18,9 @@ class AnimatedToggle(QWidget):
         self.anim.setEasingCurve(QEasingCurve.OutCubic)
 
     def mousePressEvent(self, event):
+        self.on_click()
+
+    def on_click(self):
         self._checked = not self._checked
 
         self.anim.stop()
@@ -27,7 +30,6 @@ class AnimatedToggle(QWidget):
 
         self.toggled.emit(self._checked)
         self.update()
-
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)

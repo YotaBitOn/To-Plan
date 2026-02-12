@@ -403,7 +403,7 @@ border-radius: 25px;
 }</string>
         </property>
         <property name="currentIndex">
-         <number>4</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="day">
          <property name="minimumSize">

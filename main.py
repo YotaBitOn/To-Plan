@@ -161,7 +161,7 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.description_input_label.setText(task_description)
 
     if tasks[cur_task]['nextOccurrence']:
-        mw.repeatable_widget.setVisible(True)
+        mw.repeatable_set_widget.setVisible(True)
         mw.task_graphs_widget.setVisible(True)
 
         next_occurrence_date =  datetime.datetime.fromtimestamp(tasks[cur_task]['nextOccurrence']).strftime("%d.%m.%Y")
@@ -169,7 +169,7 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
 
         mw.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
     else:
-        mw.repeatable_widget.setVisible(False)
+        mw.repeatable_set_widget.setVisible(False)
         mw.task_graphs_widget.setVisible(False)
 
     if len(tasks[cur_task]['taskSteps']) == 0:
@@ -193,9 +193,15 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.steps_label.setText(f'{task_name} steps')
     mw.steps_stack.setCurrentIndex(tasks[task_name]['taskNo'])
 
-def set_repeatable_menu():
+def set_popup_repeatable_menu():
     global popup
     popup.repeatable_widget.setVisible(popup.repeatable_toggle._checked)
+    mw.repeatable_toggle.on_click()
+    mw.repeatable_set_widget.setVisible(mw.repeatable_toggle._checked)
+
+def set_mw_repeatable_menu():
+    global mw
+    mw.repeatable_set_widget.setVisible(mw.repeatable_toggle._checked)
 
 def submit():
     global popup, task_ammo
@@ -220,6 +226,8 @@ def submit():
             popup.every_box.currentText(),
             popup.at_timeedit.time(),
         ))
+        mw.every_box.setCurrentIndex(popup.every_box.currentIndex())
+        set_mw_every_stack()
 
     cursor.execute("""
     INSERT INTO users
@@ -236,12 +244,12 @@ def submit():
     task_ammo+=1
 
     popup.close()
-    popup = None
+
     #add repeatable
 
 def show_add_task_popup():
     global popup
-
+    popup = None
     popup = loader.load(popup_ui, None)
 
     #popup.setStretch(1,1,1,1,1,1,1,1)
@@ -252,31 +260,59 @@ def show_add_task_popup():
 
     popup.repeatable_toggle = AnimatedToggle.AnimatedToggle(popup)
     popup.repeatable_layout.replaceWidget(popup.rep_switch, popup.repeatable_toggle)
-    popup.repeatable_toggle.toggled.connect(set_repeatable_menu)
+    popup.repeatable_toggle.toggled.connect(set_popup_repeatable_menu)
 
     popup.submit_button.clicked.connect(submit)
 
-    popup.every_box.currentTextChanged.connect(set_every_stack)
+    popup.every_box.currentTextChanged.connect(set_popup_every_stack)
 
     popup.show()
 
-def set_every_stack():
+def set_popup_every_stack():
+    global popup
     cur_option = popup.every_box.currentText()
 
     popup.every_stack.setVisible(True)
     if cur_option == 'Few Days':
         popup.every_stack.setCurrentWidget(popup.few_days)
+
     elif cur_option == 'Week':
         popup.every_stack.setCurrentWidget(popup.week)
+
     elif cur_option == 'Mounth':
         popup.every_stack.setCurrentWidget(popup.mounth)
+
     elif cur_option == 'Year':
         popup.every_stack.setCurrentWidget(popup.year)
+
     elif cur_option == 'Day':
-        popup.every_stack.setCurrentWidget(popup.day)
+        popup.every_stack.setCurrentWidget(mw.day)
         popup.every_stack.setVisible(False)
 
-    print('p')
+def set_mw_every_stack():
+    cur_option = mw.every_box.currentText()
+
+    mw.every_stack.setVisible(True)
+    if cur_option == 'Few Days':
+        mw.every_stack.setCurrentWidget(mw.few_days)
+        mw.few_days_edit.setText(popup.few_days_edit.text())
+
+    elif cur_option == 'Week':
+        mw.every_stack.setCurrentWidget(mw.week)
+        # to do
+
+    elif cur_option == 'Mounth':
+        mw.every_stack.setCurrentWidget(mw.mounth)
+        mw.day_edit_2.setText(popup.day_edit_2.text())
+
+    elif cur_option == 'Year':
+        mw.every_stack.setCurrentWidget(mw.year)
+        mw.day_edit.setText(popup.day_edit.text())
+        mw.mounth_edit.setCurrentIndex(popup.mounth_edit.currentIndex())
+
+    elif cur_option == 'Day':
+        mw.every_stack.setCurrentWidget(mw.day)
+        mw.every_stack.setVisible(False)
 
 def add_task_step():
     #mw.steps_stack.setVisible(True)
@@ -302,6 +338,7 @@ def calculate_next_occurrence(rep_type, at_time):
         next_occurrence = cur_datetime_stamp + 86400 * value
 
     elif rep_type == 'Week':
+        return 0
         pass#gonnado later
 
     elif rep_type == 'Mounth':
@@ -310,17 +347,16 @@ def calculate_next_occurrence(rep_type, at_time):
 
         value = int(popup.day_edit_2.text())
 
-        next_occurrence = cur_mounth_stamp + 86400 * value
+        next_occurrence = cur_mounth_stamp + 86400 * (value-1)
     elif rep_type == 'Year':
 
         cur_year = QDate(cur_date.year(), 1, 1)
         cur_year_stamp = QDateTime(cur_year, at_time).toSecsSinceEpoch()
 
-
         day_value = int(popup.day_edit.text())
         mounth_value = mounth_number[popup.mounth_edit.currentText()]
 
-        req_date = QDate(cur_date.year()+1, day_value, mounth_value)
+        req_date = QDate(cur_date.year()+1, mounth_value, day_value)
 
         next_occurrence = cur_year_stamp + 86400 * cur_year.daysTo(req_date)
 
@@ -329,6 +365,7 @@ def calculate_next_occurrence(rep_type, at_time):
         next_occurrence = cur_datetime + 86400
 
     return next_occurrence
+
 def update_progress_bar():
     global mw
     progress = (sum(tasks[cur_task]['taskSteps'].values()) / len(tasks[cur_task]['taskSteps'])) * 100
@@ -359,8 +396,15 @@ mw.task_step_progress.setVisible(False)
 mw.task_info_stack.setVisible(False)
 mw.tabWidget.setCurrentIndex(0)
 
+mw.repeatable_toggle = AnimatedToggle.AnimatedToggle(mw)
+mw.repeatable_widget.layout().replaceWidget(mw.rep_switch, mw.repeatable_toggle)
+mw.repeatable_toggle.toggled.connect(set_mw_repeatable_menu)
+
 mw.add_task_button.clicked.connect(show_add_task_popup)
 mw.add_task_step_button.clicked.connect(add_task_step)
 mw.task_complete_button.clicked.connect(complete_task)
+
+mw.every_box.currentTextChanged.connect(set_mw_every_stack)
+
 mw.show()
 app.exec()
