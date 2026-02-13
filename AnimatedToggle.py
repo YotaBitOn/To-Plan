@@ -25,7 +25,7 @@ class AnimatedToggle(QWidget):
 
         self.anim.stop()
         self.anim.setStartValue(self._offset)
-        self.anim.setEndValue(26 if self._checked else 2)
+        self.anim.setEndValue(26 if self._checked else self._offset)
         self.anim.start()
 
         self.toggled.emit(self._checked)
