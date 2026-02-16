@@ -133,7 +133,7 @@ class Task(QWidget):
 
 
         self.task.installEventFilter(self)
-        self.task.task_check_4.clicked.connect(complete_task)
+        self.task.task_check_4.clicked.connect(lambda x: complete_task(self.name))
         parent.layout().addWidget(self.task)
 
     def eventFilter(self, obj, event):
@@ -162,8 +162,6 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
     mw.description_input_label.setText(task_description)
 
-    mw.every_box.setCurrentIndex(tasks[cur_task]['repeatable']['rep_option'])
-    set_mw_every_stack(tasks[cur_task]['repeatable']['rep_vals'])
 
     if tasks[cur_task]['repeatable']['is_repeatable']:
         mw.repeatable_set_widget.setVisible(True)
@@ -176,6 +174,9 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
         next_occurrence_time =  datetime.datetime.fromtimestamp(tasks[cur_task]['repeatable']['nextOccurrence']).strftime("%H:%M")
 
         mw.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+
+        mw.every_box.setCurrentIndex(tasks[cur_task]['repeatable']['rep_option'])
+        set_mw_every_stack(tasks[cur_task]['repeatable']['rep_vals'])
     else:
         if mw.repeatable_toggle._checked:
             mw.repeatable_toggle.on_click()
@@ -431,16 +432,24 @@ def update_progress_bar():
     tasks[cur_task]['progress'] = round(progress, 1)
     mw.task_step_progress.setValue(tasks[cur_task]['progress'])
 
-def complete_task():
+def complete_task(task_name = cur_task):
     global mw
-    tasks[cur_task]['completed'] = not tasks[cur_task]['completed']
 
-    if tasks[cur_task]['completed']:
-        mw.task_complete_button.setIcon(QIcon('icons_white/circle-check-big.svg'))
-        tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle-check-big.svg'))
+    if task_name == cur_task:
+        tasks[cur_task]['completed'] = not tasks[cur_task]['completed']
+        if tasks[cur_task]['completed']:
+            mw.task_complete_button.setIcon(QIcon('icons_white/circle-check-big.svg'))
+            tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle-check-big.svg'))
+        else:
+            mw.task_complete_button.setIcon(QIcon('icons_white/circle.svg'))
+            tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
+
     else:
-        mw.task_complete_button.setIcon(QIcon('icons_white/circle.svg'))
-        tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
+        tasks[task_name]['completed'] = not tasks[task_name]['completed']
+        if tasks[task_name]['completed']:
+            tasks[task_name]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle-check-big.svg'))
+        else:
+            tasks[task_name]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
 
 conn = sqlite3.connect('user_data.db')
 cursor = conn.cursor()
@@ -461,7 +470,7 @@ mw.repeatable_toggle.toggled.connect(toggle_mw_repeatable_menu)
 
 mw.add_task_button.clicked.connect(show_add_task_popup)
 mw.add_task_step_button.clicked.connect(add_task_step)
-mw.task_complete_button.clicked.connect(complete_task)
+mw.task_complete_button.clicked.connect(lambda x: complete_task(cur_task))
 
 mw.every_box.currentTextChanged.connect(set_mw_every_stack)
 
