@@ -108,9 +108,9 @@ class Task(QWidget):
     def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
         super().__init__()
         global mw, cur_task
-        print('before: ', cur_task)
+
         cur_task = name
-        print('after: ', cur_task)
+
         self.name = name
         self.description = description
         self.difficulty = difficulty
@@ -119,12 +119,13 @@ class Task(QWidget):
         self.task = loader.load(task_widget_ui,parent)
 
         self.task.setMaximumHeight(120)
-        self.task.task_name_8.setText(name)
-        if description == '':
-            self.task.task_description_8.setVisible(False)
-        else:
-            self.task.task_description_8.setText(description)
-        self.task.toolButton_2.setIcon(QIcon(f"icons_white/{icons[category]}"))
+        self.task.task_name.setText(name)
+
+        self.start_time = convert_qtTime_str(popup.at_timeedit.time())
+        self.end_time  = convert_qtTime_str(popup.due_timeedit.time())
+
+        self.task.task_duration.setText(f'{datetime.datetime.fromtimestamp(self.start_time).strftime("%H:%M")} - {datetime.datetime.fromtimestamp(self.end_time).strftime("%H:%M")}')
+        self.task.categ_icon.setIcon(QIcon(f"icons_white/{icons[category]}"))
         bg_color = palette[diff_col[difficulty]]
         self.task.setStyleSheet(f"""background-color: {bg_color}; border-radius: 20px;""")
 
@@ -133,22 +134,18 @@ class Task(QWidget):
 
 
         self.task.installEventFilter(self)
-        self.task.task_check_4.clicked.connect(lambda x: complete_task(self.name))
+        self.task.task_check.clicked.connect(lambda x: complete_task(self.name))
         parent.layout().addWidget(self.task)
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
             set_task_info(self.name, self.description, self.difficulty, self.category)
 
-
-def check_connection():
-    print('Hello, World!')
-
 def set_task_info(task_name, task_description, task_difficulty, task_category):
     global mw, cur_task
 
     cur_task = task_name
-    print(tasks[cur_task]['repeatable']['is_repeatable'])
+
 
     mw.task_info_stack.setVisible(True)
 
@@ -218,6 +215,11 @@ def toggle_mw_repeatable_menu():#On task createon after editing repeatable on pr
     mw.repeatable_set_widget.setVisible(status)
     tasks[cur_task]['repeatable']['is_repeatable'] = status
 
+def convert_qtTime_str(qt_Time):
+    cur_date = QDate.currentDate()
+    time = QDateTime(cur_date, qt_Time).toSecsSinceEpoch()
+
+    return time
 def submit():
     global popup, task_ammo, cur_task
 
@@ -231,13 +233,11 @@ def submit():
     _task_difficulty = popup.diff_box.currentText()
     _task_category= popup.difficulty_combobox.currentText() # rename it pls
 
-    start_time = popup.at_timeedit.time()
-    end_time = popup.timeEdit.time()
-    cur_date = QDate.currentDate()
-    start_time = QDateTime(cur_date, start_time).toSecsSinceEpoch()
-    end_time = QDateTime(cur_date, end_time).toSecsSinceEpoch()
+    start_time = convert_qtTime_str(popup.at_timeedit.time())
+    end_time = convert_qtTime_str(popup.due_timeedit.time())
 
     cur_time_in = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+
     next_occurrence = rep_option = rep_vals = None
     if _task_repeatable:
         mw.repeatable_set_widget.setVisible(True)
@@ -283,7 +283,7 @@ def submit():
     task_ammo+=1
 
     popup.close()
-    print(tasks)
+
     #add repeatable
 
 def show_add_task_popup():
@@ -388,8 +388,6 @@ def calculate_next_occurrence(rep_type, at_time, caller):
     cur_date = QDate.currentDate()
     rep_vals = []
 
-
-
     if rep_type == 'Few Days':
 
         cur_datetime_stamp = QDateTime(cur_date, at_time).toSecsSinceEpoch()
@@ -435,6 +433,8 @@ def update_progress_bar():
     global mw
     progress = (sum(tasks[cur_task]['taskSteps']['steps'].values()) / len(tasks[cur_task]['taskSteps']['steps'])) * 100
     tasks[cur_task]['progress'] = round(progress, 1)
+    tasks[cur_task]['taskWidget'].task.task_progress.setValue(round(progress, 1))
+
     mw.task_step_progress.setValue(tasks[cur_task]['progress'])
 
 def complete_task(task_name = cur_task):
@@ -444,17 +444,17 @@ def complete_task(task_name = cur_task):
         tasks[cur_task]['completed'] = not tasks[cur_task]['completed']
         if tasks[cur_task]['completed']:
             mw.task_complete_button.setIcon(QIcon('icons_white/circle-check-big.svg'))
-            tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle-check-big.svg'))
+            tasks[cur_task]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle-check-big.svg'))
         else:
             mw.task_complete_button.setIcon(QIcon('icons_white/circle.svg'))
-            tasks[cur_task]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
+            tasks[cur_task]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle.svg'))
 
     else:
         tasks[task_name]['completed'] = not tasks[task_name]['completed']
         if tasks[task_name]['completed']:
-            tasks[task_name]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle-check-big.svg'))
+            tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle-check-big.svg'))
         else:
-            tasks[task_name]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
+            tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle.svg'))
 
 def edit_repeatable():
     global mw
