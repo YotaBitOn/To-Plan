@@ -159,6 +159,8 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
     mw.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
     mw.description_input_label.setText(task_description)
 
+    mw.at_timeedit.setTime(tasks[cur_task]['duration'][0])
+    mw.due_timeedit.setTime(tasks[cur_task]['duration'][1])
 
     if tasks[cur_task]['repeatable']['is_repeatable']:
         mw.repeatable_set_widget.setVisible(True)
@@ -220,6 +222,7 @@ def convert_qtTime_str(qt_Time):
     time = QDateTime(cur_date, qt_Time).toSecsSinceEpoch()
 
     return time
+
 def submit():
     global popup, task_ammo, cur_task
 
@@ -265,11 +268,12 @@ def submit():
     task = Task(_task_name, _task_description, _task_difficulty, _task_category, _task_repeatable,parent=mw.tasks_scrollwidget)
     tasks[_task_name] = {'taskWidget': task,
                          'taskNo': task_ammo,
+                         'completed':False,
+                         'duration':[popup.at_timeedit.time(), popup.due_timeedit.time()],
                          'taskSteps': {
                              'steps' : {},
                              'page' : None
                          },
-                         'completed':False,
                          'repeatable': {
                              'is_repeatable' : _task_repeatable,
                              'next_occurrence': next_occurrence,
@@ -470,7 +474,7 @@ def edit_repeatable():
         rep_option = mw.every_box.currentIndex()
         next_occurrence, rep_vals = (calculate_next_occurrence(
             mw.every_box.currentText(),
-            mw.at_timeEdit.time(),
+            mw.at_timeedit.time(),
             mw
         ))
 

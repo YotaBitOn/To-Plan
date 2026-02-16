@@ -179,7 +179,7 @@ QPushButton:checked {
                <x>0</x>
                <y>0</y>
                <width>466</width>
-               <height>562</height>
+               <height>565</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout"/>
@@ -833,7 +833,7 @@ border-radius: 10px;</string>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QTimeEdit" name="at_timeEdit">
+                      <widget class="QTimeEdit" name="at_timeedit">
                        <property name="font">
                         <font>
                          <pointsize>20</pointsize>
@@ -865,7 +865,7 @@ border-radius: 10px;</string>
                       </widget>
                      </item>
                      <item>
-                      <widget class="QTimeEdit" name="duration">
+                      <widget class="QTimeEdit" name="due_timeedit">
                        <property name="font">
                         <font>
                          <pointsize>20</pointsize>
