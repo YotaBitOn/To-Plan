@@ -170,8 +170,8 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
 
         mw.task_graphs_widget.setVisible(True)
 
-        next_occurrence_date =  datetime.datetime.fromtimestamp(tasks[cur_task]['repeatable']['nextOccurrence']).strftime("%d.%m.%Y")
-        next_occurrence_time =  datetime.datetime.fromtimestamp(tasks[cur_task]['repeatable']['nextOccurrence']).strftime("%H:%M")
+        next_occurrence_date =  datetime.datetime.fromtimestamp(tasks[cur_task]['repeatable']['next_occurrence']).strftime("%d.%m.%Y")
+        next_occurrence_time =  datetime.datetime.fromtimestamp(tasks[cur_task]['repeatable']['next_occurrence']).strftime("%H:%M")
 
         mw.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
 
@@ -210,7 +210,9 @@ def set_popup_repeatable_menu():
     global popup
     popup.repeatable_widget.setVisible(popup.repeatable_toggle._checked)
 
-def toggle_mw_repeatable_menu():
+def toggle_mw_repeatable_menu():#On task createon after editing repeatable on prev task
+                                # raises console Error that cur_task = ''
+                                # but everything works so idk what is it
     global mw
     status = mw.repeatable_toggle._checked
     mw.repeatable_set_widget.setVisible(status)
@@ -244,6 +246,7 @@ def submit():
         next_occurrence, rep_vals = (calculate_next_occurrence(
             popup.every_box.currentText(),
             popup.at_timeedit.time(),
+            popup
         ))
         mw.every_box.setCurrentIndex(popup.every_box.currentIndex())
         set_mw_every_stack()
@@ -269,7 +272,7 @@ def submit():
                          'completed':False,
                          'repeatable': {
                              'is_repeatable' : _task_repeatable,
-                             'nextOccurrence': next_occurrence,
+                             'next_occurrence': next_occurrence,
                              'rep_option' : rep_option,
                              'rep_vals' : rep_vals
                          }
@@ -381,15 +384,17 @@ def add_task_step():
     update_progress_bar()
     #tasks[cur_task]['progress'] = 0
 
-def calculate_next_occurrence(rep_type, at_time):
+def calculate_next_occurrence(rep_type, at_time, caller):
     cur_date = QDate.currentDate()
     rep_vals = []
+
+
 
     if rep_type == 'Few Days':
 
         cur_datetime_stamp = QDateTime(cur_date, at_time).toSecsSinceEpoch()
 
-        value = int(popup.few_days_edit.text())
+        value = int(caller.few_days_edit.text())
         rep_vals.append(value)
 
         next_occurrence = cur_datetime_stamp + 86400 * value
@@ -402,7 +407,7 @@ def calculate_next_occurrence(rep_type, at_time):
         cur_mounth = QDate(cur_date.year(), cur_date.month(), 1)
         cur_mounth_stamp = QDateTime(cur_mounth, at_time).toSecsSinceEpoch()
 
-        value = int(popup.day_edit_2.text())
+        value = int(caller.day_edit_2.text())
         rep_vals.append(value)
 
         next_occurrence = cur_mounth_stamp + 86400 * (value-1)
@@ -410,11 +415,11 @@ def calculate_next_occurrence(rep_type, at_time):
         cur_year = QDate(cur_date.year(), 1, 1)
         cur_year_stamp = QDateTime(cur_year, at_time).toSecsSinceEpoch()
 
-        day_value = int(popup.day_edit.text())
-        mounth_value = mounth_number[popup.mounth_edit.currentText()]
+        day_value = int(caller.day_edit.text())
+        mounth_value = mounth_number[caller.mounth_edit.currentText()]
 
         rep_vals.append(day_value)
-        rep_vals.append(popup.mounth_edit.currentText())
+        rep_vals.append(caller.mounth_edit.currentText())
 
         req_date = QDate(cur_date.year()+1, mounth_value, day_value)
 
@@ -451,6 +456,34 @@ def complete_task(task_name = cur_task):
         else:
             tasks[task_name]['taskWidget'].task.task_check_4.setIcon(QIcon('icons_white/circle.svg'))
 
+def edit_repeatable():
+    global mw
+    if mw.edit_repeatable_button.mode == 'edit':
+        mw.edit_repeatable_button.mode = 'apply'
+        mw.edit_repeatable_button.setIcon(QIcon('icons_white/check.svg'))
+
+        mw.repeatable_edit_info_widget.setEnabled(True)
+    elif mw.edit_repeatable_button.mode == 'apply':
+        mw.edit_repeatable_button.mode = 'edit'
+        mw.edit_repeatable_button.setIcon(QIcon('icons_white/pencil.svg'))
+
+        rep_option = mw.every_box.currentIndex()
+        next_occurrence, rep_vals = (calculate_next_occurrence(
+            mw.every_box.currentText(),
+            mw.at_timeEdit.time(),
+            mw
+        ))
+
+        tasks[cur_task]['repeatable']['rep_option'] = rep_option
+        tasks[cur_task]['repeatable']['rep_vals'] = rep_vals
+        tasks[cur_task]['repeatable']['next_occurrence'] = next_occurrence
+
+        next_occurrence_date = datetime.datetime.fromtimestamp(next_occurrence).strftime("%d.%m.%Y")
+        next_occurrence_time = datetime.datetime.fromtimestamp(next_occurrence).strftime("%H:%M")
+
+        mw.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+        mw.repeatable_edit_info_widget.setEnabled(False)
+
 conn = sqlite3.connect('user_data.db')
 cursor = conn.cursor()
 
@@ -459,6 +492,7 @@ loader = QUiLoader()
 app = QApplication(sys.argv)
 mw = loader.load(main_ui, None)
 
+
 mw.task_step_progress.setVisible(False)
 #mw.steps_stack.setVisible(False)
 mw.task_info_stack.setVisible(False)
@@ -466,13 +500,15 @@ mw.tabWidget.setCurrentIndex(0)
 
 mw.repeatable_toggle = AnimatedToggle.AnimatedToggle(mw)
 mw.repeatable_widget.layout().replaceWidget(mw.rep_switch, mw.repeatable_toggle)
-mw.repeatable_toggle.toggled.connect(toggle_mw_repeatable_menu)
 
+mw.repeatable_toggle.toggled.connect(toggle_mw_repeatable_menu)
 mw.add_task_button.clicked.connect(show_add_task_popup)
 mw.add_task_step_button.clicked.connect(add_task_step)
 mw.task_complete_button.clicked.connect(lambda x: complete_task(cur_task))
-
 mw.every_box.currentTextChanged.connect(set_mw_every_stack)
+
+mw.edit_repeatable_button.mode = 'edit'
+mw.edit_repeatable_button.clicked.connect(edit_repeatable)
 
 mw.show()
 app.exec()
