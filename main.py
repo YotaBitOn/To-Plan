@@ -103,7 +103,6 @@ class TaskStep(QWidget):
         update_progress_bar()
         del self
 
-
 class Task(QWidget):
     def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
         super().__init__()
@@ -140,6 +139,17 @@ class Task(QWidget):
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
             set_task_info(self.name, self.description, self.difficulty, self.category)
+
+    def deconstruct(self):
+        self.task.deleteLater()
+        del tasks[cur_task]
+
+        #update_progress_bar()
+        mw.task_info_stack.setCurrentWidget(mw.empty_page)
+        mw.task_info_stack.setVisible(False)
+        #print(mw.task_info_stack.)
+
+        del self
 
 def set_task_info(task_name, task_description, task_difficulty, task_category):
     global mw, cur_task
@@ -435,11 +445,15 @@ def calculate_next_occurrence(rep_type, at_time, caller):
 
 def update_progress_bar():
     global mw
-    progress = (sum(tasks[cur_task]['taskSteps']['steps'].values()) / len(tasks[cur_task]['taskSteps']['steps'])) * 100
-    tasks[cur_task]['progress'] = round(progress, 1)
-    tasks[cur_task]['taskWidget'].task.task_progress.setValue(round(progress, 1))
+    if tasks[cur_task]:
+        progress = (sum(tasks[cur_task]['taskSteps']['steps'].values()) / len(tasks[cur_task]['taskSteps']['steps'])) * 100
+        tasks[cur_task]['progress'] = round(progress, 1)
+        tasks[cur_task]['taskWidget'].task.task_progress.setValue(round(progress, 1))
 
-    mw.task_step_progress.setValue(tasks[cur_task]['progress'])
+    else:
+        progress = 0
+
+    mw.task_step_progress.setValue(round(progress, 1))
 
 def complete_task(task_name = cur_task):
     global mw
@@ -498,7 +512,6 @@ mw = loader.load(main_ui, None)
 
 
 mw.task_step_progress.setVisible(False)
-#mw.steps_stack.setVisible(False)
 mw.task_info_stack.setVisible(False)
 mw.tabWidget.setCurrentIndex(0)
 
@@ -510,7 +523,7 @@ mw.add_task_button.clicked.connect(show_add_task_popup)
 mw.add_task_step_button.clicked.connect(add_task_step)
 mw.task_complete_button.clicked.connect(lambda x: complete_task(cur_task))
 mw.every_box.currentTextChanged.connect(set_mw_every_stack)
-
+mw.delete_task.clicked.connect(lambda x: tasks[cur_task]['taskWidget'].deconstruct())
 mw.edit_repeatable_button.mode = 'edit'
 mw.edit_repeatable_button.clicked.connect(edit_repeatable)
 
