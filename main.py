@@ -5,7 +5,7 @@ import datetime
 from PySide6.QtGui import QIcon, Qt
 from PySide6.QtCore import QEvent, QObject, QDate, QDateTime
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QAbstractScrollArea
 
 import AnimatedToggle
 
@@ -141,6 +141,8 @@ class Task(QWidget):
             set_task_info(self.name, self.description, self.difficulty, self.category)
 
     def deconstruct(self):
+        mw.tasks_scrollwidget.layout().removeWidget(self.task)
+        self.task.setParent(None)
         self.task.deleteLater()
         del tasks[cur_task]
 
@@ -214,6 +216,19 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
 
     mw.steps_label.setText(f'{task_name} steps')
     mw.steps_stack.setCurrentIndex(tasks[task_name]['taskNo'])
+
+
+    #for i in range(mw.steps_stack.currentWidget().layout().count()):
+    #    item = mw.steps_stack.currentWidget().layout().itemAt(i)
+#
+    #    print(item.geometry().width(), item.geometry().height())
+
+    mw.steps_stack.setMaximumHeight(mw.steps_stack.currentWidget().layout().sizeHint().height())
+    mw.steps_stack.updateGeometry()
+
+
+#
+    #mw.steps_stack.updateGeometry()
 
 def set_popup_repeatable_menu():
     global popup
@@ -396,6 +411,10 @@ def add_task_step():
     tasks[cur_task]['taskSteps']['steps'][task_step] = False
 
     update_progress_bar()
+
+    mw.steps_stack.setMaximumHeight(mw.steps_stack.currentWidget().layout().sizeHint().height() + 90)
+    mw.steps_stack.updateGeometry()
+
     #tasks[cur_task]['progress'] = 0
 
 def calculate_next_occurrence(rep_type, at_time, caller):
@@ -445,7 +464,7 @@ def calculate_next_occurrence(rep_type, at_time, caller):
 
 def update_progress_bar():
     global mw
-    if tasks[cur_task]:
+    if cur_task in tasks and len(tasks[cur_task]['taskSteps']['steps']) != 0:
         progress = (sum(tasks[cur_task]['taskSteps']['steps'].values()) / len(tasks[cur_task]['taskSteps']['steps'])) * 100
         tasks[cur_task]['progress'] = round(progress, 1)
         tasks[cur_task]['taskWidget'].task.task_progress.setValue(round(progress, 1))
@@ -510,6 +529,8 @@ loader = QUiLoader()
 app = QApplication(sys.argv)
 mw = loader.load(main_ui, None)
 
+mw.task_info_scroll_area.setWidgetResizable(True)
+mw.task_info_scroll_area.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
 
 mw.task_step_progress.setVisible(False)
 mw.task_info_stack.setVisible(False)
