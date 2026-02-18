@@ -136,6 +136,10 @@ class Task(QWidget):
         self.task.task_check.clicked.connect(lambda x: complete_task(self.name))
         parent.layout().addWidget(self.task)
 
+    def update_duration(self):
+        self.task.task_duration.setText(f'{datetime.datetime.fromtimestamp(self.start_time).strftime("%H:%M")} - {datetime.datetime.fromtimestamp(self.end_time).strftime("%H:%M")}')
+
+
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
             set_task_info(self.name, self.description, self.difficulty, self.category)
@@ -225,10 +229,6 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
 
     mw.steps_stack.setMaximumHeight(mw.steps_stack.currentWidget().layout().sizeHint().height())
     mw.steps_stack.updateGeometry()
-
-
-#
-    #mw.steps_stack.updateGeometry()
 
 def set_popup_repeatable_menu():
     global popup
@@ -521,6 +521,33 @@ def edit_repeatable():
         mw.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
         mw.repeatable_edit_info_widget.setEnabled(False)
 
+def edit_starttime():
+    global mw, cur_task
+    prev = tasks[cur_task]['duration'][0]
+
+    tasks[cur_task]['duration'][0] = mw.at_timeedit.time()
+
+    difference = prev.secsTo(mw.at_timeedit.time())
+
+    tasks[cur_task]['repeatable']['next_occurrence'] += difference
+
+    next_occurrence_date = datetime.datetime.fromtimestamp(tasks[cur_task]['repeatable']['next_occurrence']).strftime("%d.%m.%Y")
+    next_occurrence_time = datetime.datetime.fromtimestamp(tasks[cur_task]['repeatable']['next_occurrence']).strftime("%H:%M")
+
+    mw.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+
+    cur_task_widget = tasks[cur_task]['taskWidget']
+    cur_task_widget.start_time = convert_qtTime_str(mw.at_timeedit.time())
+    cur_task_widget.update_duration()
+
+def edit_endtime():
+    global mw, cur_task
+    tasks[cur_task]['duration'][1] = mw.due_timeedit.time()
+
+    cur_task_widget = tasks[cur_task]['taskWidget']
+    cur_task_widget.end_time = convert_qtTime_str(mw.due_timeedit.time())
+    cur_task_widget.update_duration()
+
 conn = sqlite3.connect('user_data.db')
 cursor = conn.cursor()
 
@@ -547,6 +574,9 @@ mw.every_box.currentTextChanged.connect(set_mw_every_stack)
 mw.delete_task.clicked.connect(lambda x: tasks[cur_task]['taskWidget'].deconstruct())
 mw.edit_repeatable_button.mode = 'edit'
 mw.edit_repeatable_button.clicked.connect(edit_repeatable)
+mw.at_timeedit.timeChanged.connect(lambda x: edit_starttime())
+mw.due_timeedit.timeChanged.connect(lambda x: edit_endtime())
+
 
 mw.show()
 app.exec()
