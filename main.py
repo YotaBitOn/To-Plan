@@ -3,11 +3,11 @@ import sys
 import datetime
 
 from PySide6.QtGui import QIcon, Qt
-from PySide6.QtCore import QEvent, QObject, QDate, QDateTime
+from PySide6.QtCore import QEvent, QDate, QDateTime
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QAbstractScrollArea
 
-import AnimatedToggle
+from logic import AnimatedToggle
 
 #moveit to .env
 user = 'Yasinets'
@@ -60,6 +60,11 @@ main_ui = "v25.ui"
 popup_ui = "add_task_popup_v6.ui"
 task_step_ui = 'task_step_v3.ui'
 
+loader = QUiLoader()
+
+conn = sqlite3.connect('../db/user_data.db')
+cursor = conn.cursor()
+
 class TaskStep(QWidget):
     def __init__(self, parent=None):
         super().__init__()
@@ -85,9 +90,9 @@ class TaskStep(QWidget):
         self.completed = not self.completed
 
         if self.completed:
-            self.taskstep.task_step_check.setIcon(QIcon('icons_white/circle-check-big.svg'))
+            self.taskstep.task_step_check.setIcon(QIcon('../sources/icons_white/circle-check-big.svg'))
         else:
-            self.taskstep.task_step_check.setIcon(QIcon('icons_white/circle.svg'))
+            self.taskstep.task_step_check.setIcon(QIcon('../sources/icons_white/circle.svg'))
 
         tasks[cur_task]['taskSteps']['steps'][self] = self.completed
 
@@ -124,7 +129,7 @@ class Task(QWidget):
         self.end_time  = convert_qtTime_str(popup.due_timeedit.time())
 
         self.task.task_duration.setText(f'{datetime.datetime.fromtimestamp(self.start_time).strftime("%H:%M")} - {datetime.datetime.fromtimestamp(self.end_time).strftime("%H:%M")}')
-        self.task.categ_icon.setIcon(QIcon(f"icons_white/{icons[category]}"))
+        self.task.categ_icon.setIcon(QIcon(f"sources/icons_white/{icons[category]}"))
         bg_color = palette[diff_col[difficulty]]
         self.task.setStyleSheet(f"""background-color: {bg_color}; border-radius: 20px;""")
 
@@ -207,9 +212,9 @@ def set_task_info(task_name, task_description, task_difficulty, task_category):
         mw.task_step_progress.setVisible(True)
 
     if tasks[cur_task]['completed']:
-        mw.task_complete_button.setIcon(QIcon('icons_white/circle-check-big.svg'))
+        mw.task_complete_button.setIcon(QIcon('../sources/icons_white/circle-check-big.svg'))
     else:
-        mw.task_complete_button.setIcon(QIcon('icons_white/circle.svg'))
+        mw.task_complete_button.setIcon(QIcon('../sources/icons_white/circle.svg'))
 
     if tasks[task_name]['taskNo'] not in range(mw.steps_stack.count()):
         task_step_page = QWidget()
@@ -480,29 +485,29 @@ def complete_task(task_name = cur_task):
     if task_name == cur_task:
         tasks[cur_task]['completed'] = not tasks[cur_task]['completed']
         if tasks[cur_task]['completed']:
-            mw.task_complete_button.setIcon(QIcon('icons_white/circle-check-big.svg'))
-            tasks[cur_task]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle-check-big.svg'))
+            mw.task_complete_button.setIcon(QIcon('../sources/icons_white/circle-check-big.svg'))
+            tasks[cur_task]['taskWidget'].task.task_check.setIcon(QIcon('../sources/icons_white/circle-check-big.svg'))
         else:
-            mw.task_complete_button.setIcon(QIcon('icons_white/circle.svg'))
-            tasks[cur_task]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle.svg'))
+            mw.task_complete_button.setIcon(QIcon('../sources/icons_white/circle.svg'))
+            tasks[cur_task]['taskWidget'].task.task_check.setIcon(QIcon('../sources/icons_white/circle.svg'))
 
     else:
         tasks[task_name]['completed'] = not tasks[task_name]['completed']
         if tasks[task_name]['completed']:
-            tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle-check-big.svg'))
+            tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('../sources/icons_white/circle-check-big.svg'))
         else:
-            tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('icons_white/circle.svg'))
+            tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('../sources/icons_white/circle.svg'))
 
 def edit_repeatable():
     global mw
     if mw.edit_repeatable_button.mode == 'edit':
         mw.edit_repeatable_button.mode = 'apply'
-        mw.edit_repeatable_button.setIcon(QIcon('icons_white/check.svg'))
+        mw.edit_repeatable_button.setIcon(QIcon('../sources/icons_white/check.svg'))
 
         mw.repeatable_edit_info_widget.setEnabled(True)
     elif mw.edit_repeatable_button.mode == 'apply':
         mw.edit_repeatable_button.mode = 'edit'
-        mw.edit_repeatable_button.setIcon(QIcon('icons_white/pencil.svg'))
+        mw.edit_repeatable_button.setIcon(QIcon('../sources/icons_white/pencil.svg'))
 
         rep_option = mw.every_box.currentIndex()
         next_occurrence, rep_vals = (calculate_next_occurrence(
@@ -548,35 +553,32 @@ def edit_endtime():
     cur_task_widget.end_time = convert_qtTime_str(mw.due_timeedit.time())
     cur_task_widget.update_duration()
 
-conn = sqlite3.connect('user_data.db')
-cursor = conn.cursor()
+def main():
 
-loader = QUiLoader()
+    app = QApplication(sys.argv)
+    mw = loader.load(main_ui, None)
 
-app = QApplication(sys.argv)
-mw = loader.load(main_ui, None)
+    mw.task_info_scroll_area.setWidgetResizable(True)
+    mw.task_info_scroll_area.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
 
-mw.task_info_scroll_area.setWidgetResizable(True)
-mw.task_info_scroll_area.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+    mw.task_step_progress.setVisible(False)
+    mw.task_info_stack.setVisible(False)
+    mw.tabWidget.setCurrentIndex(0)
 
-mw.task_step_progress.setVisible(False)
-mw.task_info_stack.setVisible(False)
-mw.tabWidget.setCurrentIndex(0)
+    mw.repeatable_toggle = AnimatedToggle.AnimatedToggle(mw)
+    mw.repeatable_widget.layout().replaceWidget(mw.rep_switch, mw.repeatable_toggle)
 
-mw.repeatable_toggle = AnimatedToggle.AnimatedToggle(mw)
-mw.repeatable_widget.layout().replaceWidget(mw.rep_switch, mw.repeatable_toggle)
-
-mw.repeatable_toggle.toggled.connect(toggle_mw_repeatable_menu)
-mw.add_task_button.clicked.connect(show_add_task_popup)
-mw.add_task_step_button.clicked.connect(add_task_step)
-mw.task_complete_button.clicked.connect(lambda x: complete_task(cur_task))
-mw.every_box.currentTextChanged.connect(set_mw_every_stack)
-mw.delete_task.clicked.connect(lambda x: tasks[cur_task]['taskWidget'].deconstruct())
-mw.edit_repeatable_button.mode = 'edit'
-mw.edit_repeatable_button.clicked.connect(edit_repeatable)
-mw.at_timeedit.timeChanged.connect(lambda x: edit_starttime())
-mw.due_timeedit.timeChanged.connect(lambda x: edit_endtime())
+    mw.repeatable_toggle.toggled.connect(toggle_mw_repeatable_menu)
+    mw.add_task_button.clicked.connect(show_add_task_popup)
+    mw.add_task_step_button.clicked.connect(add_task_step)
+    mw.task_complete_button.clicked.connect(lambda x: complete_task(cur_task))
+    mw.every_box.currentTextChanged.connect(set_mw_every_stack)
+    mw.delete_task.clicked.connect(lambda x: tasks[cur_task]['taskWidget'].deconstruct())
+    mw.edit_repeatable_button.mode = 'edit'
+    mw.edit_repeatable_button.clicked.connect(edit_repeatable)
+    mw.at_timeedit.timeChanged.connect(lambda x: edit_starttime())
+    mw.due_timeedit.timeChanged.connect(lambda x: edit_endtime())
 
 
-mw.show()
-app.exec()
+    mw.show()
+    app.exec()
