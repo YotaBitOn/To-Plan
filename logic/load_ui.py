@@ -1,5 +1,6 @@
 from PySide6.QtUiTools import QUiLoader
 
+#variables
 from config.env_loader import *
 
 popup = QUiLoader().load(popup_ui, None)

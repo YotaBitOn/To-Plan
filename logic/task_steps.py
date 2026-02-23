@@ -1,10 +1,13 @@
 from PySide6.QtGui import QIcon
 from PySide6.QtUiTools import QUiLoader
 
-from appState import state
+#variables
 from config.env_loader import task_step_ui
 from config.ui_constants import palette
-from signalHub import signals
+from logic.appState import state
+
+#funcs
+from logic.signalHub import signals
 
 class TaskStep():
     def __init__(self, parent=None):
