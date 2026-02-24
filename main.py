@@ -6,8 +6,9 @@ def main():
     app = QApplication(sys.argv)
 
     from logic.mainWindow import mw
+    from logic.pop_up import popup
 
-    mw.show()
+    mw.ui.show()
     app.exec()
 
 if __name__ == '__main__':

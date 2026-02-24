@@ -13,13 +13,12 @@ from logic.appState import state
 from logic.core import convert_qtTime_str
 from logic.signalHub import signals
 
-from pop_up import popup
-class Task():
-    def __init__(self,name, description, difficulty, category, repeatable = 0,parent = None):
-        super().__init__()
-        global mw, cur_task
 
-        cur_task = name
+class Task():
+    def __init__(self,name, description, difficulty, category, start_time, end_time, parent = None):
+        super().__init__()
+
+        state.cur_task = name
 
         self.name = name
         self.description = description
@@ -31,8 +30,8 @@ class Task():
         self.task.setMaximumHeight(120)
         self.task.task_name.setText(name)
 
-        self.start_time = convert_qtTime_str(popup.at_timeedit.time())
-        self.end_time  = convert_qtTime_str(popup.due_timeedit.time())
+        self.start_time = start_time
+        self.end_time  = end_time
 
         self.task.task_duration.setText(f'{datetime.datetime.fromtimestamp(self.start_time).strftime("%H:%M")} - {datetime.datetime.fromtimestamp(self.end_time).strftime("%H:%M")}')
         self.task.categ_icon.setIcon(QIcon(f"sources/icons_white/{icons[category]}"))
@@ -55,14 +54,17 @@ class Task():
             #set_task_info(self.name, self.description, self.difficulty, self.category)
             signals.update_task_info.emit(self.name, self.description, self.difficulty, self.category)
     def deconstruct(self):
-        mw.tasks_scrollwidget.layout().removeWidget(self.task)
+        signals.setEmptyPage.emit(self.name)
+
+        #mw.tasks_scrollwidget.layout().removeWidget(self.task)
         self.task.setParent(None)
         self.task.deleteLater()
-        del state.tasks[cur_task]
+        del state.tasks[state.cur_task]
 
         #update_progress_bar()
-        mw.task_info_stack.setCurrentWidget(mw.empty_page)
-        mw.task_info_stack.setVisible(False)
+
+        #mw.task_info_stack.setCurrentWidget(mw.empty_page)
+        #mw.task_info_stack.setVisible(False)
         #print(mw.task_info_stack.)
         del self
 

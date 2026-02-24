@@ -87,7 +87,7 @@ border-radius: 15px;</string>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>icons_white/chevron-left.svg</normaloff>icons_white/chevron-left.svg</iconset>
+                 <normaloff>sources/icons_white/chevron-left.svg</normaloff>sources/icons_white/chevron-left.svg</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -128,7 +128,7 @@ border-radius: 15px;</string>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>icons_white/chevron-right.svg</normaloff>icons_white/chevron-right.svg</iconset>
+                 <normaloff>sources/icons_white/chevron-right.svg</normaloff>sources/icons_white/chevron-right.svg</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -210,7 +210,7 @@ border-radius: 15px;</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>icons_white/plus.svg</normaloff>icons_white/plus.svg</iconset>
+              <normaloff>sources/icons_white/plus.svg</normaloff>sources/icons_white/plus.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -355,7 +355,7 @@ QPushButton:checked {
                        </property>
                        <property name="icon">
                         <iconset>
-                         <normaloff>icons_white/circle.svg</normaloff>icons_white/circle.svg</iconset>
+                         <normaloff>sources/icons_white/circle.svg</normaloff>sources/icons_white/circle.svg</iconset>
                        </property>
                        <property name="iconSize">
                         <size>
@@ -1052,7 +1052,7 @@ border-top-right-radius: 0px;
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>icons_white/plus.svg</normaloff>icons_white/plus.svg</iconset>
+                       <normaloff>sources/icons_white/plus.svg</normaloff>sources/icons_white/plus.svg</iconset>
                      </property>
                      <property name="iconSize">
                       <size>
@@ -1779,7 +1779,7 @@ border-top-right-radius: 0px;
                         </property>
                         <property name="icon">
                          <iconset>
-                          <normaloff>icons_white/pencil.svg</normaloff>icons_white/pencil.svg</iconset>
+                          <normaloff>sources/icons_white/pencil.svg</normaloff>sources/icons_white/pencil.svg</iconset>
                         </property>
                         <property name="iconSize">
                          <size>
@@ -1875,7 +1875,7 @@ background-color: rgb(40,40, 40);</string>
                        </property>
                        <property name="icon">
                         <iconset>
-                         <normaloff>icons_white/flame.svg</normaloff>icons_white/flame.svg</iconset>
+                         <normaloff>sources/icons_white/flame.svg</normaloff>sources/icons_white/flame.svg</iconset>
                        </property>
                        <property name="iconSize">
                         <size>
@@ -1929,7 +1929,7 @@ background-color: rgb(40,40, 40);</string>
                        </property>
                        <property name="icon">
                         <iconset>
-                         <normaloff>icons_white/flame.svg</normaloff>icons_white/flame.svg</iconset>
+                         <normaloff>sources/icons_white/flame.svg</normaloff>sources/icons_white/flame.svg</iconset>
                        </property>
                        <property name="iconSize">
                         <size>
@@ -2008,7 +2008,7 @@ border-radius: 15px;</string>
                   </property>
                   <property name="icon">
                    <iconset>
-                    <normaloff>icons_white/trash.svg</normaloff>icons_white/trash.svg</iconset>
+                    <normaloff>sources/icons_white/trash.svg</normaloff>sources/icons_white/trash.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -2919,7 +2919,7 @@ border-radius: 100px;</string>
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap>icons_white/user-round.svg</pixmap>
+                 <pixmap>sources/icons_white/user-round.svg</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>

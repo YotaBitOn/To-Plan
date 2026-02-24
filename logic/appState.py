@@ -5,4 +5,5 @@ class AppState:
         self.task_ammo = 0
         self.tasks = {}
 
+
 state = AppState()

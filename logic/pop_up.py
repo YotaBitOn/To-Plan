@@ -8,6 +8,7 @@ from logic.appState import state
 
 #funcs
 from logic.core import convert_qtTime_str, calculate_next_occurrence
+from logic.signalHub import signals
 
 #instances
 from data.init_db import conn, cursor
@@ -19,13 +20,6 @@ class Popup():
         self.ui = None
         self.ui = QUiLoader().load(popup_ui, None)
 
-        self.show_add_task_popup()
-
-    def show_add_task_popup(self):
-        self.ui.repeatable_widget.setVisible(False)
-        self.ui.every_stack.setCurrentWidget(self.ui.day)
-        self.ui.every_stack.setVisible(False)
-
         from ui.widgets.toggle import AnimatedToggle
 
         self.ui.repeatable_toggle = AnimatedToggle(self.ui)
@@ -36,46 +30,55 @@ class Popup():
 
         self.ui.every_box.currentTextChanged.connect(self.set_popup_every_stack)
 
+        #signals.show_add_task_self.ui.connect(lambda :self.show_add_task_popup())
+        #self.show_add_task_popup()
+
+    def show_add_task_popup(self):
+        print('show_add_task_popup')
+        self.ui.repeatable_widget.setVisible(False)
+        self.ui.every_stack.setCurrentWidget(self.ui.day)
+        self.ui.every_stack.setVisible(False)
+
         self.ui.show()
 
     def set_popup_repeatable_menu(self):
-        popup.repeatable_widget.setVisible(popup.repeatable_toggle._checked)
+        self.ui.repeatable_widget.setVisible(self.ui.repeatable_toggle._checked)
 
     def set_popup_every_stack(self):
-        cur_option = popup.every_box.currentText()
+        cur_option = self.ui.every_box.currentText()
 
-        popup.every_stack.setVisible(True)
+        self.ui.every_stack.setVisible(True)
         if cur_option == 'Few Days':
-            popup.every_stack.setCurrentWidget(popup.few_days)
+            self.ui.every_stack.setCurrentWidget(self.ui.few_days)
 
         elif cur_option == 'Week':
-            popup.every_stack.setCurrentWidget(popup.week)
+            self.ui.every_stack.setCurrentWidget(self.ui.week)
 
         elif cur_option == 'Mounth':
-            popup.every_stack.setCurrentWidget(popup.mounth)
+            self.ui.every_stack.setCurrentWidget(self.ui.mounth)
 
         elif cur_option == 'Year':
-            popup.every_stack.setCurrentWidget(popup.year)
+            self.ui.every_stack.setCurrentWidget(self.ui.year)
 
         elif cur_option == 'Day':
-            popup.every_stack.setCurrentWidget(mw.day)
-            popup.every_stack.setVisible(False)
+            self.ui.every_stack.setCurrentWidget(mw.day)
+            self.ui.every_stack.setVisible(False)
 
     def submit(self):
         global popup, task_ammo, cur_task
 
-        _task_name = popup.name_edit.text()
+        _task_name = self.ui.name_edit.text()
         cur_task = _task_name
-        _task_repeatable = popup.repeatable_toggle._checked
+        _task_repeatable = self.ui.repeatable_toggle._checked
         if _task_name == '':
             _task_name = f"Task #{task_ammo}"
 
-        _task_description = popup.description_edit.toPlainText()
-        _task_difficulty = popup.diff_box.currentText()
-        _task_category= popup.difficulty_combobox.currentText() # rename it pls
+        _task_description = self.ui.description_edit.toPlainText()
+        _task_difficulty = self.ui.diff_box.currentText()
+        _task_category= self.ui.difficulty_combobox.currentText() # rename it pls
 
-        start_time = convert_qtTime_str(popup.at_timeedit.time())
-        end_time = convert_qtTime_str(popup.due_timeedit.time())
+        start_time = convert_qtTime_str(self.ui.at_timeedit.time())
+        end_time = convert_qtTime_str(self.ui.due_timeedit.time())
 
         cur_time_in = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
 
@@ -83,13 +86,13 @@ class Popup():
         if _task_repeatable:
             mw.repeatable_set_widget.setVisible(True)
 
-            rep_option = popup.every_box.currentIndex()
+            rep_option = self.ui.every_box.currentIndex()
             next_occurrence, rep_vals = (calculate_next_occurrence(
-                popup.every_box.currentText(),
-                popup.at_timeedit.time(),
+                self.ui.every_box.currentText(),
+                self.ui.at_timeedit.time(),
                 popup
             ))
-            mw.every_box.setCurrentIndex(popup.every_box.currentIndex())
+            mw.every_box.setCurrentIndex(self.ui.every_box.currentIndex())
             mw.funcs.set_mw_every_stack()
         else:
             if mw.repeatable_toggle._checked:
@@ -103,11 +106,11 @@ class Popup():
         (user,_task_name,start_time,end_time,_task_difficulty,_task_category,0,_task_repeatable,next_occurrence,''))
         conn.commit() #<-----------IMPORTANT (off for test cases)
 
-        task = Task(_task_name, _task_description, _task_difficulty, _task_category, _task_repeatable,parent=mw.tasks_scrollwidget)
+        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=mw.tasks_scrollwidget)
         state.tasks[_task_name] = {'taskWidget': task,
                              'taskNo': task_ammo,
                              'completed':False,
-                             'duration':[popup.at_timeedit.time(), popup.due_timeedit.time()],
+                             'duration':[self.ui.at_timeedit.time(), self.ui.due_timeedit.time()],
                              'taskSteps': {
                                  'steps' : {},
                                  'page' : None
@@ -124,8 +127,11 @@ class Popup():
 
         task_ammo+=1
 
-        popup.close()
+        self.ui.close()
 
         #add repeatable
-
+print("signals id:", id(signals))
 popup = Popup()
+#signals.show_add_task_popup.connect(lambda : print('eee'))
+signals.show_add_task_popup.connect(lambda: popup.show_add_task_popup())
+#signals.show_add_task_popup.connect(lambda : print('eeee'))
