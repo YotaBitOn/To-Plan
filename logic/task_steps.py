@@ -14,7 +14,7 @@ class TaskStep():
         super().__init__()
 
 
-        self.taskstep = QUiLoader.load(task_step_ui, None)
+        self.taskstep = QUiLoader().load(task_step_ui, None)
         self.completed = False
         self.taskstep.stackedWidget.setCurrentIndex(1)
         self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {palette['black']};""")
@@ -38,7 +38,7 @@ class TaskStep():
         else:
             self.taskstep.task_step_check.setIcon(QIcon('sources/icons_white/circle.svg'))
 
-        state.taskstasks[state.cur_task]['taskSteps']['steps'][self] = self.completed
+        state.tasks[state.cur_task]['taskSteps']['steps'][self] = self.completed
 
         signals.update_progress_bar.emit()
 
@@ -47,7 +47,7 @@ class TaskStep():
 
     def deconstruct(self):
         self.taskstep.deleteLater()
-        del state.taskstasks[state.cur_task]['taskSteps']['steps'][self]
+        del state.tasks[state.cur_task]['taskSteps']['steps'][self]
 
         signals.update_progress_bar.emit()
         del self

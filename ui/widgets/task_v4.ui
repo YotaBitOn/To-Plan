@@ -51,7 +51,7 @@ border-radius: 20px;</string>
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>icons_white/utensils-crossed.svg</normaloff>icons_white/utensils-crossed.svg</iconset>
+         <normaloff>sources/icons_white/utensils-crossed.svg</normaloff>sources/icons_white/utensils-crossed.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -127,7 +127,7 @@ QPushButton:checked {
        </property>
        <property name="icon">
         <iconset>
-         <normaloff>icons_white/circle.svg</normaloff>icons_white/circle.svg</iconset>
+         <normaloff>sources/icons_white/circle.svg</normaloff>sources/icons_white/circle.svg</iconset>
        </property>
        <property name="iconSize">
         <size>

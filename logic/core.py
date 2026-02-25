@@ -12,7 +12,7 @@ def calculate_next_occurrence(rep_type, at_time, caller):
 
         cur_datetime_stamp = QDateTime(cur_date, at_time).toSecsSinceEpoch()
 
-        value = int(caller.few_days_edit.text())
+        value = int(caller.ui.few_days_edit.text())
         rep_vals.append(value)
 
         next_occurrence = cur_datetime_stamp + 86400 * value
@@ -25,7 +25,7 @@ def calculate_next_occurrence(rep_type, at_time, caller):
         cur_mounth = QDate(cur_date.year(), cur_date.month(), 1)
         cur_mounth_stamp = QDateTime(cur_mounth, at_time).toSecsSinceEpoch()
 
-        value = int(caller.day_edit_2.text())
+        value = int(caller.ui.day_edit_2.text())
         rep_vals.append(value)
 
         next_occurrence = cur_mounth_stamp + 86400 * (value-1)
@@ -33,11 +33,11 @@ def calculate_next_occurrence(rep_type, at_time, caller):
         cur_year = QDate(cur_date.year(), 1, 1)
         cur_year_stamp = QDateTime(cur_year, at_time).toSecsSinceEpoch()
 
-        day_value = int(caller.day_edit.text())
-        mounth_value = mounth_number[caller.mounth_edit.currentText()]
+        day_value = int(caller.ui.day_edit.text())
+        mounth_value = mounth_number[caller.ui.mounth_edit.currentText()]
 
         rep_vals.append(day_value)
-        rep_vals.append(caller.mounth_edit.currentText())
+        rep_vals.append(caller.ui.mounth_edit.currentText())
 
         req_date = QDate(cur_date.year()+1, mounth_value, day_value)
 

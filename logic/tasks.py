@@ -3,6 +3,7 @@ import datetime
 from PySide6.QtCore import QEvent, Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QWidget
 
 #variables
 from config.env_loader import task_widget_ui
@@ -14,7 +15,7 @@ from logic.core import convert_qtTime_str
 from logic.signalHub import signals
 
 
-class Task():
+class Task(QWidget):
     def __init__(self,name, description, difficulty, category, start_time, end_time, parent = None):
         super().__init__()
 
@@ -25,7 +26,7 @@ class Task():
         self.difficulty = difficulty
         self.category = category
 
-        self.task = QUiLoader.load(task_widget_ui,None)
+        self.task = QUiLoader().load(task_widget_ui, None)
 
         self.task.setMaximumHeight(120)
         self.task.task_name.setText(name)

@@ -18,9 +18,11 @@ class AnimatedToggle(QWidget):
         self.anim.setEasingCurve(QEasingCurve.OutCubic)
 
     def mousePressEvent(self, event):
+        print('r1')
         self.on_click()
 
     def on_click(self):
+        print('r2')
         self._checked = not self._checked
 
         self.anim.stop()

@@ -65,13 +65,12 @@ class Popup():
             self.ui.every_stack.setVisible(False)
 
     def submit(self):
-        global popup, task_ammo, cur_task
 
         _task_name = self.ui.name_edit.text()
-        cur_task = _task_name
+        state.cur_task = _task_name
         _task_repeatable = self.ui.repeatable_toggle._checked
         if _task_name == '':
-            _task_name = f"Task #{task_ammo}"
+            _task_name = f"Task #{state.task_ammo}"
 
         _task_description = self.ui.description_edit.toPlainText()
         _task_difficulty = self.ui.diff_box.currentText()
@@ -84,7 +83,7 @@ class Popup():
 
         next_occurrence = rep_option = rep_vals = None
         if _task_repeatable:
-            mw.repeatable_set_widget.setVisible(True)
+            mw.ui.repeatable_set_widget.setVisible(True)
 
             rep_option = self.ui.every_box.currentIndex()
             next_occurrence, rep_vals = (calculate_next_occurrence(
@@ -92,23 +91,23 @@ class Popup():
                 self.ui.at_timeedit.time(),
                 popup
             ))
-            mw.every_box.setCurrentIndex(self.ui.every_box.currentIndex())
-            mw.funcs.set_mw_every_stack()
+            mw.ui.every_box.setCurrentIndex(self.ui.every_box.currentIndex())
+            mw.funcs.set_mw_every_stack(rep_vals)
         else:
-            if mw.repeatable_toggle._checked:
-                mw.repeatable_toggle.on_click()
-            mw.repeatable_set_widget.setVisible(False)
+            if mw.ui.repeatable_toggle._checked:
+                mw.ui.repeatable_toggle.on_click()
+            mw.ui.repeatable_set_widget.setVisible(False)
 
-        cursor.execute("""
-        INSERT INTO users
-        (user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps)
-        VALUES (?,?,?,?,?,?,?,?,?,?)""",
-        (user,_task_name,start_time,end_time,_task_difficulty,_task_category,0,_task_repeatable,next_occurrence,''))
-        conn.commit() #<-----------IMPORTANT (off for test cases)
+        #cursor.execute("""
+        #INSERT INTO users
+        #(user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps)
+        #VALUES (?,?,?,?,?,?,?,?,?,?)""",
+        #(user,_task_name,start_time,end_time,_task_difficulty,_task_category,0,_task_repeatable,next_occurrence,''))
+        #conn.commit() #<-----------IMPORTANT (off for test cases)
 
-        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=mw.tasks_scrollwidget)
+        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=mw.ui.tasks_scrollwidget)
         state.tasks[_task_name] = {'taskWidget': task,
-                             'taskNo': task_ammo,
+                             'taskNo': state.task_ammo,
                              'completed':False,
                              'duration':[self.ui.at_timeedit.time(), self.ui.due_timeedit.time()],
                              'taskSteps': {
@@ -125,7 +124,7 @@ class Popup():
 
         mw.funcs.set_task_info(_task_name, _task_description, _task_difficulty, _task_category)
 
-        task_ammo+=1
+        state.task_ammo+=1
 
         self.ui.close()
 

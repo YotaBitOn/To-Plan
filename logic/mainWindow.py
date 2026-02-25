@@ -20,9 +20,10 @@ class MainWindow(QMainWindow):
 
         self.ui = QUiLoader().load(main_ui, None)
 
+        self.setStart()
         self.setCustomWidgets()
         self.linkFuncs()
-        #self.ui.show()
+        #self.ui.show())
     def setStart(self):
         self.ui.task_step_progress.setVisible(False)
         self.ui.task_info_stack.setVisible(False)
@@ -40,7 +41,7 @@ class MainWindow(QMainWindow):
         #signals
         signals.complete_task.connect(lambda name: self.funcs.complete_task(task_name=name))
         signals.update_task_info.connect(lambda *args: self.funcs.set_task_info(*args))
-        signals.update_progress_bar.connect(lambda x: self.funcs.update_progress_bar())
+        signals.update_progress_bar.connect(lambda: self.funcs.update_progress_bar())
         signals.setEmptyPage.connect(lambda name: self.funcs.setEmptyPage(name=name))
         #popup related
         self.ui.add_task_button.clicked.connect(lambda x: signals.show_add_task_popup.emit())
@@ -51,7 +52,7 @@ class MainWindow(QMainWindow):
         #task related
         self.ui.delete_task.clicked.connect(lambda x: state.tasks[state.cur_task]['taskWidget'].deconstruct())
         self.ui.every_box.currentTextChanged.connect(lambda x: self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals']) )
-        self.ui.repeatable_toggle.toggled.connect(lambda x: self.funcs.toggle_mw_repeatable_menu)
+        self.ui.repeatable_toggle.toggled.connect(lambda x: self.funcs.toggle_mw_repeatable_menu())
         self.ui.task_complete_button.clicked.connect(lambda x: self.funcs.complete_task(state.cur_task))
         self.ui.edit_repeatable_button.mode = 'edit'
         self.ui.edit_repeatable_button.clicked.connect(lambda x: self.funcs.edit_repeatable())
@@ -138,33 +139,49 @@ class MWindowFuncs():
         if state.cur_task is None:
             return
         prev = state.tasks[state.cur_task]['duration'][0]
+        cur_task_widget = state.tasks[state.cur_task]['taskWidget']
 
         state.tasks[state.cur_task]['duration'][0] = self.ui.at_timeedit.time()
 
-        difference = prev.secsTo(self.ui.at_timeedit.time())
+        cur_task_widget.start_time = convert_qtTime_str(self.ui.at_timeedit.time())
 
-        state.tasks[state.cur_task]['repeatable']['next_occurrence'] += difference
+        if self.ui.at_timeedit.time() > state.tasks[state.cur_task]['duration'][1]:
+            state.tasks[state.cur_task]['duration'][1] = self.ui.at_timeedit.time()
+            cur_task_widget.end_time = convert_qtTime_str(self.ui.at_timeedit.time())
 
-        next_occurrence_date = datetime.datetime.fromtimestamp(state.tasks[state.cur_task]['repeatable']['next_occurrence']).strftime("%d.%m.%Y")
-        next_occurrence_time = datetime.datetime.fromtimestamp(state.tasks[state.cur_task]['repeatable']['next_occurrence']).strftime("%H:%M")
+            self.ui.due_timeedit.setTime(self.ui.at_timeedit.time())
+        cur_task_widget.update_duration()
 
-        self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+        if state.tasks[state.cur_task]['repeatable']['next_occurrence'] is not None:
+            difference = prev.secsTo(self.ui.at_timeedit.time())
 
-        state.cur_task_widget = state.tasks[state.cur_task]['taskWidget']
-        state.cur_task_widget.start_time = convert_qtTime_str(self.ui.at_timeedit.time())
-        state.cur_task_widget.update_duration()
+            state.tasks[state.cur_task]['repeatable']['next_occurrence'] += difference
+
+            next_occurrence_date = datetime.datetime.fromtimestamp(state.tasks[state.cur_task]['repeatable']['next_occurrence']).strftime("%d.%m.%Y")
+            next_occurrence_time = datetime.datetime.fromtimestamp(state.tasks[state.cur_task]['repeatable']['next_occurrence']).strftime("%H:%M")
+
+            self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
 
     def edit_endtime(self):
 
         state.tasks[state.cur_task]['duration'][1] = self.ui.due_timeedit.time()
 
-        state.cur_task_widget = state.tasks[state.cur_task]['taskWidget']
-        state.cur_task_widget.end_time = convert_qtTime_str(self.ui.due_timeedit.time())
-        state.cur_task_widget.update_duration()
+        cur_task_widget = state.tasks[state.cur_task]['taskWidget']
+        cur_task_widget.end_time = convert_qtTime_str(self.ui.due_timeedit.time())
+
+        if self.ui.due_timeedit.time() < state.tasks[state.cur_task]['duration'][0]:
+            state.tasks[state.cur_task]['duration'][0] = self.ui.due_timeedit.time()
+            cur_task_widget.start_time = convert_qtTime_str(self.ui.due_timeedit.time())
+
+            self.ui.at_timeedit.setTime(self.ui.due_timeedit.time())
+
+        cur_task_widget.update_duration()
 
     def toggle_mw_repeatable_menu(self):#On task createon after editing repeatable on prev task
                                     # raises console Error that state.cur_task = ''
                                     # but everything works so idk what is it
+        print('rr')
+
         status = self.ui.repeatable_toggle._checked
         self.ui.repeatable_set_widget.setVisible(status)
         state.tasks[state.cur_task]['repeatable']['is_repeatable'] = status
@@ -177,7 +194,6 @@ class MWindowFuncs():
             self.ui.every_stack.setCurrentWidget(self.ui.few_days)
 
             self.ui.few_days_edit.setText(str(vals[0]))
-
 
         elif cur_option == 'Week':
             self.ui.every_stack.setCurrentWidget(self.ui.week)
@@ -212,7 +228,7 @@ class MWindowFuncs():
             next_occurrence, rep_vals = (calculate_next_occurrence(
                 self.ui.every_box.currentText(),
                 self.ui.at_timeedit.time(),
-                self.ui
+                self
             ))
 
             state.tasks[state.cur_task]['repeatable']['rep_option'] = rep_option
@@ -249,10 +265,10 @@ class MWindowFuncs():
 
     def update_progress_bar(self):
 
-        if state.cur_task in state.tasks and len(state.taskstasks[state.cur_task]['taskSteps']['steps']) != 0:
-            progress = (sum(state.taskstasks[state.cur_task]['taskSteps']['steps'].values()) / len(state.taskstasks[state.cur_task]['taskSteps']['steps'])) * 100
-            state.taskstasks[state.cur_task]['progress'] = round(progress, 1)
-            state.taskstasks[state.cur_task]['taskWidget'].task.task_progress.setValue(round(progress, 1))
+        if state.cur_task in state.tasks and len(state.tasks[state.cur_task]['taskSteps']['steps']) != 0:
+            progress = (sum(state.tasks[state.cur_task]['taskSteps']['steps'].values()) / len(state.tasks[state.cur_task]['taskSteps']['steps'])) * 100
+            state.tasks[state.cur_task]['progress'] = round(progress, 1)
+            state.tasks[state.cur_task]['taskWidget'].task.task_progress.setValue(round(progress, 1))
 
         else:
             progress = 0
@@ -263,24 +279,24 @@ class MWindowFuncs():
         #mw.steps_stack.setVisible(True)
         self.ui.task_step_progress.setVisible(True)
 
-        task_page = state.taskstasks[state.cur_task]['taskSteps']['page']
+        task_page = state.tasks[state.cur_task]['taskSteps']['page']
         task_page_layout = task_page.layout()
         task_step = TaskStep(parent=task_page)
         task_page_layout.addWidget(task_step.taskstep)
 
-        state.taskstasks[state.cur_task]['taskSteps']['steps'][task_step] = False
+        state.tasks[state.cur_task]['taskSteps']['steps'][task_step] = False
 
         self.update_progress_bar()
 
         self.ui.steps_stack.setMaximumHeight(self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
         self.ui.steps_stack.updateGeometry()
 
-        #state.taskstasks[state.cur_task]['progress'] = 0
+        #state.tasks[state.cur_task]['progress'] = 0
 
     def setEmptyPage(self, name):
         self.ui.tasks_scrollwidget.layout().removeWidget(state.tasks[name]['taskWidget'])
 
-        self.ui.task_info_stack.setCurrentWidget(mw.empty_page)
+        self.ui.task_info_stack.setCurrentWidget(self.ui.empty_page)
         self.ui.task_info_stack.setVisible(False)
 print("signals id:", id(signals))
 mw = MainWindow()

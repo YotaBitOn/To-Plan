@@ -116,7 +116,7 @@
          </property>
          <property name="icon">
           <iconset>
-           <normaloff>icons_white/check.svg</normaloff>icons_white/check.svg</iconset>
+           <normaloff>sources/icons_white/check.svg</normaloff>sources/icons_white/check.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -187,7 +187,7 @@ QPushButton:checked {
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>icons_white/circle.svg</normaloff>icons_white/circle.svg</iconset>
+       <normaloff>sources/icons_white/circle.svg</normaloff>sources/icons_white/circle.svg</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -228,7 +228,7 @@ QPushButton:checked {
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>icons_white/pencil.svg</normaloff>icons_white/pencil.svg</iconset>
+       <normaloff>sources/icons_white/pencil.svg</normaloff>sources/icons_white/pencil.svg</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -257,7 +257,7 @@ QPushButton:checked {
      </property>
      <property name="icon">
       <iconset>
-       <normaloff>icons_white/trash.svg</normaloff>icons_white/trash.svg</iconset>
+       <normaloff>sources/icons_white/trash.svg</normaloff>sources/icons_white/trash.svg</iconset>
      </property>
      <property name="iconSize">
       <size>
