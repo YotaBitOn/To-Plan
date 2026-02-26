@@ -69,27 +69,26 @@ class MWindowFuncs():
         self.ui = ui
 
     def set_task_info(self, task_name, task_description, task_difficulty, task_category):
-        ###
+        ### variables
         state.cur_task = task_name
         task_date = state.tasks[task_name]['taskDate']['date']
         task_no = state.tasks[task_name]['taskNo']
         task_duration = state.tasks[state.cur_task]['duration']
-        ###
+        ### visibility
         self.ui.task_info_stack.setVisible(True)
 
         self.ui.task_info_stack.setCurrentIndex(0)
         self.ui.category_stack.setCurrentIndex(0)
         self.ui.difficulty_stack.setCurrentIndex(0)
         self.ui.description_label_edit_layout.setCurrentIndex(0)
-        ###
+        ### value assigment
         self.ui.task_name_label.setText(task_name)
         self.ui.category.setText(task_category)
         self.ui.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
         self.ui.description_input_label.setText(task_description)
-
         self.ui.at_timeedit.setTime(task_duration[0])
         self.ui.due_timeedit.setTime(task_duration[1])
-        ###
+        ### repeatable repeatable setting
         if state.tasks[state.cur_task]['repeatable']['is_repeatable']:
             self.ui.repeatable_set_widget.setVisible(True)
             if not self.ui.repeatable_toggle._checked:
@@ -110,19 +109,19 @@ class MWindowFuncs():
 
             self.ui.repeatable_set_widget.setVisible(False)
             self.ui.task_graphs_widget.setVisible(False)
-        ###
+        ### step widget visibility
         if len(state.tasks[state.cur_task]['taskSteps']['steps']) == 0:
             self.ui.task_step_progress.setVisible(False)
             self.ui.task_step_progress.setValue(0)
         else:
             self.update_progress_bar()
             self.ui.task_step_progress.setVisible(True)
-        ###
+        ### completed setting
         if state.tasks[state.cur_task]['completed']:
             self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
         else:
             self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle.svg'))
-        ###
+        ### steps stting
         if task_no not in range(self.ui.steps_stack.count()):
             task_step_page = QWidget()
             task_step_page_layout = QVBoxLayout(task_step_page)
@@ -133,7 +132,9 @@ class MWindowFuncs():
         self.ui.steps_label.setText(f'{task_name} steps')
         self.ui.steps_stack.setCurrentIndex(task_no)
 
-#       ###
+        self.ui.steps_stack.setMaximumHeight(self.ui.steps_stack.currentWidget().layout().sizeHint().height())
+        self.ui.steps_stack.updateGeometry()
+#       ### date setting
         self.ui.tasks_date_label.setText(task_date)
 
         if task_date not in state.dates:
@@ -152,9 +153,6 @@ class MWindowFuncs():
         date_page.layout().addWidget(state.tasks[task_name]['taskWidget'].task)
         self.ui.task_list_stack.setCurrentWidget(date_page)
 #       ###
-        self.ui.steps_stack.setMaximumHeight(self.ui.steps_stack.currentWidget().layout().sizeHint().height())
-        self.ui.steps_stack.updateGeometry()
-
     def edit_starttime(self):
         if state.cur_task is None:
             return
@@ -197,11 +195,7 @@ class MWindowFuncs():
 
         cur_task_widget.update_duration()
 
-    def toggle_mw_repeatable_menu(self):#On task createon after editing repeatable on prev task
-                                    # raises console Error that state.cur_task = ''
-                                    # but everything works so idk what is it
-        print('rr')
-
+    def toggle_mw_repeatable_menu(self):
         status = self.ui.repeatable_toggle._checked
         self.ui.repeatable_set_widget.setVisible(status)
         state.tasks[state.cur_task]['repeatable']['is_repeatable'] = status
@@ -311,8 +305,6 @@ class MWindowFuncs():
         self.ui.steps_stack.setMaximumHeight(self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
         self.ui.steps_stack.updateGeometry()
 
-        #state.tasks[state.cur_task]['progress'] = 0
-
     def setEmptyPage(self, name):
         self.ui.tasks_scrollwidget.layout().removeWidget(state.tasks[name]['taskWidget'])
 
@@ -320,8 +312,6 @@ class MWindowFuncs():
         self.ui.task_info_stack.setVisible(False)
 
     def change_date(self, mode):
-
-
         new_date = state.cur_date + (86400 * mode)
         state.cur_date = new_date
 

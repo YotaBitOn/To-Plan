@@ -54,20 +54,13 @@ class Task(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
-            #set_task_info(self.name, self.description, self.difficulty, self.category)
             signals.update_task_info.emit(self.name, self.description, self.difficulty, self.category)
     def deconstruct(self):
         signals.setEmptyPage.emit(self.name)
 
-        #mw.tasks_scrollwidget.layout().removeWidget(self.task)
         self.task.setParent(None)
         self.task.deleteLater()
         del state.tasks[state.cur_task]
 
-        #update_progress_bar()
-
-        #mw.task_info_stack.setCurrentWidget(mw.empty_page)
-        #mw.task_info_stack.setVisible(False)
-        #print(mw.task_info_stack.)
         del self
 

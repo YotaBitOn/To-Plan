@@ -5,7 +5,6 @@ from PySide6.QtCore import QDate, QDateTime
 #variables
 from config.time_constans import mounth_number
 
-
 def calculate_next_occurrence(rep_type, at_time, caller):
     cur_date = QDate.currentDate()
     rep_vals = []

@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime, timezone
 
-conn = sqlite3.connect("user_data.db")
+conn = sqlite3.connect("data/user_data.db")
 cursor = conn.cursor()
 
 cursor.execute("""
@@ -25,10 +25,9 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-cur_time_in = int(datetime.now(timezone.utc).timestamp())
-print(cur_time_in)
+cur_time = int(datetime.now(timezone.utc).timestamp())
 
 cursor.execute(f"""
-INSERT INTO users (user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps) VALUES ('Yasinets','DoThis', {cur_time_in}, {cur_time_in + 3600}, 'Free', 'Sport', 1,0,0,'')""")
+INSERT INTO users (user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps) VALUES ('Yasinets','DoThis', {cur_time}, {cur_time + 3600}, 'Free', 'Sport', 1,0,0,'')""")
 conn.commit()
 conn.close()
