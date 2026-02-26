@@ -45,7 +45,9 @@ class Task(QWidget):
 
         self.task.installEventFilter(self)
         self.task.task_check.clicked.connect(lambda : signals.complete_task.emit(self.name))
-        parent.layout().addWidget(self.task)
+
+        if parent:
+            parent.layout().addWidget(self.task)
 
     def update_duration(self):
         self.task.task_duration.setText(f'{datetime.datetime.fromtimestamp(self.start_time).strftime("%H:%M")} - {datetime.datetime.fromtimestamp(self.end_time).strftime("%H:%M")}')

@@ -9,11 +9,12 @@ from config.env_loader import main_ui
 from logic.appState import state
 
 #funcs
-from logic.core import convert_qtTime_str, calculate_next_occurrence
+from logic.core import convert_qtTime_str, calculate_next_occurrence, datetime_str
 from logic.signalHub import signals
 
 #instances
 from logic.task_steps import TaskStep
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -24,6 +25,7 @@ class MainWindow(QMainWindow):
         self.setCustomWidgets()
         self.linkFuncs()
         #self.ui.show())
+
     def setStart(self):
         self.ui.task_step_progress.setVisible(False)
         self.ui.task_info_stack.setVisible(False)
@@ -58,6 +60,8 @@ class MainWindow(QMainWindow):
         self.ui.edit_repeatable_button.clicked.connect(lambda x: self.funcs.edit_repeatable())
         self.ui.at_timeedit.timeChanged.connect(lambda x: self.funcs.edit_starttime())
         self.ui.due_timeedit.timeChanged.connect(lambda x: self.funcs.edit_endtime())
+        self.ui.tasks_prev_button.clicked.connect(lambda x: self.funcs.change_date(-1))
+        self.ui.tasks_next_button.clicked.connect(lambda x: self.funcs.change_date(1))
 
 
 class MWindowFuncs():
@@ -65,24 +69,27 @@ class MWindowFuncs():
         self.ui = ui
 
     def set_task_info(self, task_name, task_description, task_difficulty, task_category):
+        ###
         state.cur_task = task_name
-
-
+        task_date = state.tasks[task_name]['taskDate']['date']
+        task_no = state.tasks[task_name]['taskNo']
+        task_duration = state.tasks[state.cur_task]['duration']
+        ###
         self.ui.task_info_stack.setVisible(True)
 
         self.ui.task_info_stack.setCurrentIndex(0)
         self.ui.category_stack.setCurrentIndex(0)
         self.ui.difficulty_stack.setCurrentIndex(0)
         self.ui.description_label_edit_layout.setCurrentIndex(0)
-
+        ###
         self.ui.task_name_label.setText(task_name)
         self.ui.category.setText(task_category)
         self.ui.difficulty.setText(task_difficulty)  # RENAME THEIR LABELS
         self.ui.description_input_label.setText(task_description)
 
-        self.ui.at_timeedit.setTime(state.tasks[state.cur_task]['duration'][0])
-        self.ui.due_timeedit.setTime(state.tasks[state.cur_task]['duration'][1])
-
+        self.ui.at_timeedit.setTime(task_duration[0])
+        self.ui.due_timeedit.setTime(task_duration[1])
+        ###
         if state.tasks[state.cur_task]['repeatable']['is_repeatable']:
             self.ui.repeatable_set_widget.setVisible(True)
             if not self.ui.repeatable_toggle._checked:
@@ -103,20 +110,20 @@ class MWindowFuncs():
 
             self.ui.repeatable_set_widget.setVisible(False)
             self.ui.task_graphs_widget.setVisible(False)
-
+        ###
         if len(state.tasks[state.cur_task]['taskSteps']['steps']) == 0:
             self.ui.task_step_progress.setVisible(False)
             self.ui.task_step_progress.setValue(0)
         else:
             self.update_progress_bar()
             self.ui.task_step_progress.setVisible(True)
-
+        ###
         if state.tasks[state.cur_task]['completed']:
             self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
         else:
             self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle.svg'))
-
-        if state.tasks[task_name]['taskNo'] not in range(self.ui.steps_stack.count()):
+        ###
+        if task_no not in range(self.ui.steps_stack.count()):
             task_step_page = QWidget()
             task_step_page_layout = QVBoxLayout(task_step_page)
             state.tasks[task_name]['taskSteps']['page'] = task_step_page
@@ -124,14 +131,27 @@ class MWindowFuncs():
             self.ui.steps_stack.addWidget(task_step_page)
 
         self.ui.steps_label.setText(f'{task_name} steps')
-        self.ui.steps_stack.setCurrentIndex(state.tasks[task_name]['taskNo'])
+        self.ui.steps_stack.setCurrentIndex(task_no)
 
+#       ###
+        self.ui.tasks_date_label.setText(task_date)
 
-        #for i in range(self.ui.steps_stack.currentWidget().layout().count()):
-        #    item = self.ui.steps_stack.currentWidget().layout().itemAt(i)
-    #
-        #    print(item.geometry().width(), item.geometry().height())
+        if task_date not in state.dates:
 
+            date_page = QWidget()
+            date_page.setObjectName(task_date)
+            date_page_layout = QVBoxLayout(date_page)
+
+            self.ui.task_list_stack.addWidget(date_page)
+            state.dates.append(task_date)
+
+        else:
+            date_page = self.ui.task_list_stack.findChild(QWidget, task_date)
+
+        state.tasks[task_name]['taskDate']['page'] = date_page
+        date_page.layout().addWidget(state.tasks[task_name]['taskWidget'].task)
+        self.ui.task_list_stack.setCurrentWidget(date_page)
+#       ###
         self.ui.steps_stack.setMaximumHeight(self.ui.steps_stack.currentWidget().layout().sizeHint().height())
         self.ui.steps_stack.updateGeometry()
 
@@ -298,5 +318,27 @@ class MWindowFuncs():
 
         self.ui.task_info_stack.setCurrentWidget(self.ui.empty_page)
         self.ui.task_info_stack.setVisible(False)
-print("signals id:", id(signals))
+
+    def change_date(self, mode):
+
+
+        new_date = state.cur_date + (86400 * mode)
+        state.cur_date = new_date
+
+        new_date_str = datetime_str(new_date)
+        if new_date_str not in state.dates:
+
+            date_page = QWidget()
+            date_page.setObjectName(new_date_str)
+            date_page_layout = QVBoxLayout(date_page)
+
+            self.ui.task_list_stack.addWidget(date_page)
+            state.dates.append(new_date_str)
+
+        else:
+            date_page = self.ui.task_list_stack.findChild(QWidget, new_date_str)
+
+        self.ui.tasks_date_label.setText(new_date_str)
+        self.ui.task_list_stack.setCurrentWidget(date_page)
+
 mw = MainWindow()

@@ -1,13 +1,15 @@
 import datetime
 
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QVBoxLayout
 
 #variables
 from config.env_loader import popup_ui, user
 from logic.appState import state
 
 #funcs
-from logic.core import convert_qtTime_str, calculate_next_occurrence
+from logic.core import convert_qtTime_str, calculate_next_occurrence, datetime_str
 from logic.signalHub import signals
 
 #instances
@@ -65,7 +67,7 @@ class Popup():
             self.ui.every_stack.setVisible(False)
 
     def submit(self):
-
+        ###
         _task_name = self.ui.name_edit.text()
         state.cur_task = _task_name
         _task_repeatable = self.ui.repeatable_toggle._checked
@@ -79,8 +81,8 @@ class Popup():
         start_time = convert_qtTime_str(self.ui.at_timeedit.time())
         end_time = convert_qtTime_str(self.ui.due_timeedit.time())
 
-        cur_time_in = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
-
+        task_date = datetime_str(state.cur_date)
+        ###
         next_occurrence = rep_option = rep_vals = None
         if _task_repeatable:
             mw.ui.repeatable_set_widget.setVisible(True)
@@ -104,12 +106,18 @@ class Popup():
         #VALUES (?,?,?,?,?,?,?,?,?,?)""",
         #(user,_task_name,start_time,end_time,_task_difficulty,_task_category,0,_task_repeatable,next_occurrence,''))
         #conn.commit() #<-----------IMPORTANT (off for test cases)
+        ###
 
-        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=mw.ui.tasks_scrollwidget)
+        ###
+        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=None)
         state.tasks[_task_name] = {'taskWidget': task,
                              'taskNo': state.task_ammo,
                              'completed':False,
                              'duration':[self.ui.at_timeedit.time(), self.ui.due_timeedit.time()],
+                             'taskDate' : {
+                                 'date' : task_date,
+                                 'page' : None #<-------------!!!
+                             },
                              'taskSteps': {
                                  'steps' : {},
                                  'page' : None
@@ -121,7 +129,7 @@ class Popup():
                                  'rep_vals' : rep_vals
                              }
                              }
-
+        ##
         mw.funcs.set_task_info(_task_name, _task_description, _task_difficulty, _task_category)
 
         state.task_ammo+=1
@@ -129,8 +137,6 @@ class Popup():
         self.ui.close()
 
         #add repeatable
-print("signals id:", id(signals))
+
 popup = Popup()
-#signals.show_add_task_popup.connect(lambda : print('eee'))
 signals.show_add_task_popup.connect(lambda: popup.show_add_task_popup())
-#signals.show_add_task_popup.connect(lambda : print('eeee'))

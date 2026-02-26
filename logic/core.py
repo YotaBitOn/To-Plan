@@ -1,3 +1,5 @@
+import datetime
+
 from PySide6.QtCore import QDate, QDateTime
 
 #variables
@@ -54,3 +56,7 @@ def convert_qtTime_str(qt_Time):
     time = QDateTime(cur_date, qt_Time).toSecsSinceEpoch()
 
     return time
+
+def datetime_str(datetime_stamp):
+
+    return datetime.datetime.fromtimestamp(datetime_stamp).strftime('%d.%m.%Y')
