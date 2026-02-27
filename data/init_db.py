@@ -12,22 +12,20 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user TEXT,
     taskName TEXT,
-    start_time INTEGER,
-    end_time   INTEGER,
+    date TEXT,
+    at_time INTEGER,
+    due_time   INTEGER,
     difficulty TEXT,
     category TEXT,
     completed INTEGER,
     repeatable INTEGER,
-    next_occurrence INTEGER,
-    task_steps INTEGER
-    task_steps TEXT
+    rep_option TEXT,
+    rep_vals TEXT,
+    task_steps_ammo INTEGER,
+    task_steps_infos TEXT, 
     
 )
 """)
 
-cur_time = int(datetime.now(timezone.utc).timestamp())
-
-cursor.execute(f"""
-INSERT INTO users (user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps) VALUES ('Yasinets','DoThis', {cur_time}, {cur_time + 3600}, 'Free', 'Sport', 1,0,0,'')""")
 conn.commit()
 conn.close()
