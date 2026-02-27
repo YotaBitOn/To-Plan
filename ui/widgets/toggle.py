@@ -18,20 +18,19 @@ class AnimatedToggle(QWidget):
         self.anim.setEasingCurve(QEasingCurve.OutCubic)
 
     def mousePressEvent(self, event):
-        print('r1')
         self.on_click()
 
     def on_click(self):
-        print('r2')
         self._checked = not self._checked
 
         self.anim.stop()
         self.anim.setStartValue(self._offset)
-        self.anim.setEndValue(26 if self._checked else self._offset)
+        self.anim.setEndValue(26 if self._checked else 2)
         self.anim.start()
 
         self.toggled.emit(self._checked)
         self.update()
+
     def paintEvent(self, event):
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
@@ -42,7 +41,6 @@ class AnimatedToggle(QWidget):
         p.setPen(Qt.NoPen)
         p.drawRoundedRect(0, 0, self.width(), self.height(), 13, 13)
 
-        # knob
         p.setBrush(Qt.white)
         p.drawEllipse(self._offset, 2, 22, 22)
 
@@ -50,7 +48,9 @@ class AnimatedToggle(QWidget):
         return self._offset
 
     def setOffset(self, value):
+
         self._offset = value
+
         self.update()
 
     offset = Property(float, getOffset, setOffset)
