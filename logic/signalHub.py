@@ -4,7 +4,7 @@ class AppSignals(QObject):
     show_add_task_popup = Signal()
 
     update_progress_bar = Signal()
-    update_task_info = Signal(str,str,str,str)
+    update_task_info = Signal(str)
 
     complete_task = Signal(str)
     setEmptyPage = Signal(str)
@@ -15,5 +15,3 @@ class AppSignals(QObject):
 
 
 signals = AppSignals()
-
-#signals.show_add_task_popup.connect(lambda : print('ee'))

@@ -3,7 +3,7 @@ import datetime
 from PySide6.QtCore import QDate, QDateTime
 
 #variables
-from config.time_constans import mounth_number
+from config.constants import mounth_number
 
 def calculate_next_occurrence(rep_type, at_time, caller):
     cur_date = QDate.currentDate()
@@ -55,6 +55,9 @@ def convert_qtTime_str(qt_Time):
     time = QDateTime(cur_date, qt_Time).toSecsSinceEpoch()
 
     return time
+
+def convert_qtTime_int(qt_Time):
+    return qt_Time.hour() * 3600 + qt_Time.minute() * 60 + qt_Time.second()
 
 def datetime_str(datetime_stamp):
 

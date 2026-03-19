@@ -13,3 +13,6 @@ task_step_ui = os.getenv('task_step_ui')
 
 #user
 user = os.getenv('user')
+
+#mode
+drop_db_mode = int(os.getenv('drop_db_mode'))

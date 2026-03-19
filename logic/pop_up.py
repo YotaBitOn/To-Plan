@@ -5,20 +5,20 @@ from config.env_loader import popup_ui, user
 from logic.appState import state
 
 #funcs
-from logic.core import convert_qtTime_str, calculate_next_occurrence, datetime_str
+from logic.core import convert_qtTime_int, calculate_next_occurrence, datetime_str
 from logic.signalHub import signals
 
 #instances
 from data.init_db import conn, cursor
 from logic.mainWindow import mw
-from logic.tasks import Task
+from logic.widgets import Task
 
 class Popup():
     def __init__(self):
         self.ui = None
         self.ui = QUiLoader().load(popup_ui, None)
 
-        from ui.widgets.toggle import AnimatedToggle
+        from logic.widgets import  AnimatedToggle
 
         self.ui.repeatable_toggle = AnimatedToggle(self.ui)
         self.ui.repeatable_layout.replaceWidget(self.ui.rep_switch, self.ui.repeatable_toggle)
@@ -74,8 +74,8 @@ class Popup():
         _task_difficulty = self.ui.diff_box.currentText()
         _task_category= self.ui.difficulty_combobox.currentText() # rename it pls
 
-        start_time = convert_qtTime_str(self.ui.at_timeedit.time())
-        end_time = convert_qtTime_str(self.ui.due_timeedit.time())
+        start_time = convert_qtTime_int(self.ui.at_timeedit.time())
+        end_time = convert_qtTime_int(self.ui.due_timeedit.time())
 
         task_date = datetime_str(state.cur_date)
         ### repeatable setting
@@ -96,20 +96,46 @@ class Popup():
                 mw.ui.repeatable_toggle.on_click()
             mw.ui.repeatable_set_widget.setVisible(False)
 
-        #cursor.execute("""
-        #INSERT INTO users
-        #(user, taskName, start_time, end_time, difficulty, category, completed, repeatable,next_occurrence,task_steps)
-        #VALUES (?,?,?,?,?,?,?,?,?,?)""",
-        #(user,_task_name,start_time,end_time,_task_difficulty,_task_category,0,_task_repeatable,next_occurrence,''))
-        #conn.commit() #<-----------IMPORTANT (off for test cases)
+        ### prepare data to sending
+
+
+        str_rep_vals = ''
+        if _task_repeatable:
+            for val in rep_vals:
+                str_rep_vals += str(val)
+                str_rep_vals += ' '
+        ### send data to db
+        cursor.execute("""
+        INSERT INTO users
+        (
+        user,
+        taskName,
+        date,
+        at_time,
+        due_time,
+        difficulty,
+        category,
+        completed,
+        repeatable,
+        rep_option,
+        rep_vals,
+        task_steps_infos,
+        description
+        )
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+        (user,_task_name,task_date,start_time,end_time,_task_difficulty,_task_category,0,_task_repeatable,rep_option,str_rep_vals,'',_task_description))
+        conn.commit() #<-----------IMPORTANT (off for test cases)
 
         ### task widget setting
-        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=None)
+        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=None)#change it
         ### tasks dict setting !!!! THIS DICT IS PLANNED TO BE REPLACED WiTH DB!!! one day, mark my words
         state.tasks[_task_name] = {'taskWidget': task,
                              'taskNo': state.task_ammo,
+                             'difficulty': _task_difficulty,
+                             'category': _task_category,
+                             'description': _task_description,
                              'completed':False,
-                             'duration':[self.ui.at_timeedit.time(), self.ui.due_timeedit.time()],
+                             'duration':[convert_qtTime_int(self.ui.at_timeedit.time()), convert_qtTime_int(self.ui.due_timeedit.time())],
                              'taskDate' : {
                                  'date' : task_date,
                                  'page' : None
@@ -127,7 +153,7 @@ class Popup():
                              }
         state.task_ammo += 1
         ### passing setting further process to main window and closing
-        mw.funcs.set_task_info(_task_name, _task_description, _task_difficulty, _task_category)
+        mw.funcs.set_task_info(_task_name)
         self.ui.close()
 
 popup = Popup()
