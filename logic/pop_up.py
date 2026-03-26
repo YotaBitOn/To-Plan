@@ -1,3 +1,5 @@
+import datetime
+
 from PySide6.QtUiTools import QUiLoader
 
 #variables
@@ -13,12 +15,13 @@ from data.init_db import conn, cursor
 from logic.mainWindow import mw
 from logic.widgets import Task
 
+
 class Popup():
     def __init__(self):
         self.ui = None
         self.ui = QUiLoader().load(popup_ui, None)
 
-        from logic.widgets import  AnimatedToggle
+        from logic.widgets import AnimatedToggle
 
         self.ui.repeatable_toggle = AnimatedToggle(self.ui)
         self.ui.repeatable_layout.replaceWidget(self.ui.rep_switch, self.ui.repeatable_toggle)
@@ -65,15 +68,16 @@ class Popup():
     def submit(self):
         ### variables
         _task_name = self.ui.name_edit.text()
-        taskId = state.task_ammo
+        taskId = int(datetime.datetime.now().timestamp())
+
         state.cur_task = taskId
         _task_repeatable = self.ui.repeatable_toggle._checked
         if _task_name == '':
-            _task_name = f"Task #{taskId}"
+            _task_name = f"Task #{state.task_ammo}"
 
         _task_description = self.ui.description_edit.toPlainText()
         _task_difficulty = self.ui.diff_box.currentText()
-        _task_category= self.ui.difficulty_combobox.currentText() # rename it pls
+        _task_category = self.ui.difficulty_combobox.currentText()  # rename it pls
 
         start_time = convert_qtTime_int(self.ui.at_timeedit.time())
         end_time = convert_qtTime_int(self.ui.due_timeedit.time())
@@ -99,7 +103,6 @@ class Popup():
 
         ### prepare data to sending
 
-
         str_rep_vals = ''
         if _task_repeatable:
             for val in rep_vals:
@@ -109,6 +112,7 @@ class Popup():
         cursor.execute("""
         INSERT INTO users
         (
+        id,
         user,
         taskName,
         date,
@@ -123,40 +127,45 @@ class Popup():
         task_steps_infos,
         description
         )
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-        (user,_task_name,task_date,start_time,end_time,_task_difficulty,_task_category,0,_task_repeatable,rep_option,str_rep_vals,'',_task_description))
-        conn.commit() #<-----------IMPORTANT (off for test cases)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (taskId, user, _task_name, task_date, start_time, end_time, _task_difficulty, _task_category, 0,
+        _task_repeatable, rep_option, str_rep_vals, '', _task_description))
+        conn.commit()  #<-----------IMPORTANT (off for test cases)
 
         ### task widget setting
-        task = Task(taskId ,_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=None)#change it
+        task = Task(taskId, _task_name, _task_description, _task_difficulty, _task_category, start_time, end_time,
+                    parent=None)  #change it
         ### tasks dict setting !!!! THIS DICT IS PLANNED TO BE REPLACED WiTH DB!!! one day, mark my words
         state.tasks[taskId] = {
-                            'taskName' : _task_name,
-                            'taskWidget': task,
-                             'difficulty': _task_difficulty,
-                             'category': _task_category,
-                             'description': _task_description,
-                             'completed':False,
-                             'duration':[convert_qtTime_int(self.ui.at_timeedit.time()), convert_qtTime_int(self.ui.due_timeedit.time())],
-                             'taskDate' : {
-                                 'date' : task_date,
-                                 'page' : None
-                             },
-                             'taskSteps': {
-                                 'steps' : {},
-                                 'page' : None
-                             },
-                             'repeatable': {
-                                 'is_repeatable' : _task_repeatable,
-                                 'next_occurrence': next_occurrence,
-                                 'rep_option' : rep_option,
-                                 'rep_vals' : rep_vals
-                             }
-                             }
+            'taskName': _task_name,
+            'taskNo': state.task_ammo,
+            'taskWidget': task,
+            'difficulty': _task_difficulty,
+            'category': _task_category,
+            'description': _task_description,
+            'completed': False,
+            'duration': [convert_qtTime_int(self.ui.at_timeedit.time()),
+                         convert_qtTime_int(self.ui.due_timeedit.time())],
+            'taskDate': {
+                'date': task_date,
+                'page': None
+            },
+            'taskSteps': {
+                'steps': {},
+                'page': None
+            },
+            'repeatable': {
+                'is_repeatable': _task_repeatable,
+                'next_occurrence': next_occurrence,
+                'rep_option': rep_option,
+                'rep_vals': rep_vals
+            }
+        }
         state.task_ammo += 1
         ### passing setting further process to main window and closing
         mw.funcs.set_task_info(taskId)
         self.ui.close()
+
 
 popup = Popup()
 signals.show_add_task_popup.connect(lambda: popup.show_add_task_popup())

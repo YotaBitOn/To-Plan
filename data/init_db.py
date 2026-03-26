@@ -19,7 +19,7 @@ if drop_db_mode:
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER,
     user TEXT,
     taskName TEXT,
     date TEXT,
