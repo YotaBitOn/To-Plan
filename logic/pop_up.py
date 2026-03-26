@@ -65,10 +65,11 @@ class Popup():
     def submit(self):
         ### variables
         _task_name = self.ui.name_edit.text()
-        state.cur_task = _task_name
+        taskId = state.task_ammo
+        state.cur_task = taskId
         _task_repeatable = self.ui.repeatable_toggle._checked
         if _task_name == '':
-            _task_name = f"Task #{state.task_ammo}"
+            _task_name = f"Task #{taskId}"
 
         _task_description = self.ui.description_edit.toPlainText()
         _task_difficulty = self.ui.diff_box.currentText()
@@ -127,10 +128,11 @@ class Popup():
         conn.commit() #<-----------IMPORTANT (off for test cases)
 
         ### task widget setting
-        task = Task(_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=None)#change it
+        task = Task(taskId ,_task_name, _task_description, _task_difficulty, _task_category, start_time, end_time, parent=None)#change it
         ### tasks dict setting !!!! THIS DICT IS PLANNED TO BE REPLACED WiTH DB!!! one day, mark my words
-        state.tasks[_task_name] = {'taskWidget': task,
-                             'taskNo': state.task_ammo,
+        state.tasks[taskId] = {
+                            'taskName' : _task_name,
+                            'taskWidget': task,
                              'difficulty': _task_difficulty,
                              'category': _task_category,
                              'description': _task_description,
@@ -153,7 +155,7 @@ class Popup():
                              }
         state.task_ammo += 1
         ### passing setting further process to main window and closing
-        mw.funcs.set_task_info(_task_name)
+        mw.funcs.set_task_info(taskId)
         self.ui.close()
 
 popup = Popup()

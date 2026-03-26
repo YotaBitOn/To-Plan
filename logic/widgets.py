@@ -16,11 +16,12 @@ from logic.signalHub import signals
 
 
 class Task(QWidget):
-    def __init__(self,name, description, difficulty, category, start_time, end_time, parent = None):
+    def __init__(self, taskId, name, description, difficulty, category, start_time, end_time, parent = None):
         super().__init__()
 
-        state.cur_task = name
+        state.cur_task = taskId
 
+        self.id = taskId
         self.name = name
         self.description = description
         self.difficulty = difficulty
@@ -54,7 +55,8 @@ class Task(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
-            signals.update_task_info.emit(self.name)
+            signals.update_task_info.emit(self.id)
+            print(self.id)
     def deconstruct(self):
         signals.setEmptyPage.emit(self.name)
 
