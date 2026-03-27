@@ -12,7 +12,8 @@ from data.init_db import cursor, conn
 from logic.appState import state
 
 #funcs
-from logic.core import convert_qtTime_int, calculate_next_occurrence, datetime_str, convert_qtTime_int
+from logic.core import convert_qtTime_int, calculate_next_occurrence, datetime_str, convert_qtTime_int, \
+    calculate_next_occurrence_raw
 from logic.signalHub import signals
 
 #instances
@@ -23,6 +24,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.ui = QUiLoader().load(main_ui, None)
+        self.funcs = MWindowFuncs(ui=self.ui)
 
         self.setStart()
         self.setCustomWidgets()
@@ -42,8 +44,6 @@ class MainWindow(QMainWindow):
         self.ui.repeatable_widget.layout().replaceWidget(self.ui.rep_switch, self.ui.repeatable_toggle)
 
     def linkFuncs(self):
-        self.funcs = MWindowFuncs(ui = self.ui)
-
         #signals
         signals.complete_task.connect(lambda name: self.funcs.complete_task(task_name=name))
         signals.update_task_info.connect(lambda taksId: self.funcs.set_task_info(taksId))
@@ -111,10 +111,12 @@ class MainWindow(QMainWindow):
                 completed = task[6]
                 is_repeatable = task[7]
                 rep_option = task[8]
-                rep_vals = task[9]
+                rep_vals = task[9].split(' ')
                 taskSteps = task[10]
                 description = task[11]
                 taskId = task[12]
+
+                state.cur_task = taskId
 
                 print(startTime, endTime)
                 state.tasks[taskId] = {
@@ -138,9 +140,12 @@ class MainWindow(QMainWindow):
                         'is_repeatable': is_repeatable,
                         'next_occurrence': None,  # calculate_next_occur
                         'rep_option': rep_option,
-                        'rep_vals': rep_vals.split(' ')
+                        'rep_vals': rep_vals
                     }
                 }
+                task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,
+                                   parent=None)  # change it
+                state.tasks[taskId]['taskWidget'] = task_widget
 
                 if len(taskSteps) > 0 or True: #change it
                     task_step_page = QWidget()
@@ -150,8 +155,8 @@ class MainWindow(QMainWindow):
                     self.ui.steps_stack.addWidget(task_step_page)
                     self.ui.task_step_progress.setVisible(True)
                     print('lf', state.tasks[taskId]['taskSteps']['page'])
-                    for step in taskSteps.split('@')[:-1]:
 
+                    for step in taskSteps.split('@@')[:-1]:
 
                         step_name, step_completed = step[:-1], int(step[-1])
                         state.tasks[taskId]['taskSteps']['steps'][step_name] = step_completed
@@ -163,30 +168,37 @@ class MainWindow(QMainWindow):
                         task_step = TaskStep(step_name, parent=task_step_page)
                         task_page_layout.addWidget(task_step.taskstep)
 
-                        state.tasks[state.cur_task]['taskSteps']['steps'][task_step] = step_completed
+                        state.tasks[state.cur_task]['taskSteps']['steps'][step_name] = step_completed
 
-                        self.update_progress_bar()
+                        self.funcs.update_progress_bar()
 
                         self.ui.steps_stack.setMaximumHeight(
                             self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
                         self.ui.steps_stack.updateGeometry()
 
                 if is_repeatable:
-                    state.tasks[taskId]['repeatable']['next_occurrence'] = calculate_next_occurrence(
+                    next_occurrence = calculate_next_occurrence_raw(
                         rep_option,
-                        state.tasks[taskId]['repeatable']['rep_vals'],
-                        None)
+                        rep_vals,
+                        startTime)
 
 
+                    state.tasks[taskId]['repeatable']['next_occurrence'] = next_occurrence
 
-                task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,parent=None)  # change it
-                state.tasks[taskId]['taskWidget'] = task_widget
+                    next_occurrence_date = datetime.datetime.fromtimestamp(next_occurrence).strftime("%d.%m.%Y")
+                    next_occurrence_time = datetime.datetime.fromtimestamp(next_occurrence).strftime("%H:%M")
+                    print('HEEEEEEEEEEEEEEY', rep_vals, rep_option, next_occurrence_date)
+                    self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+                    self.ui.every_box.setCurrentIndex(state.tasks[state.cur_task]['repeatable']['rep_option'])
+                    self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals'])
+
 
                 state.tasks[taskId]['taskDate']['page'] = date_page
                 date_page.layout().addWidget(state.tasks[taskId]['taskWidget'].task)
 
                 state.task_ammo += 1
 
+                self.funcs.check_completion()
                 state.print_tasks()
 
 class MWindowFuncs():
@@ -218,6 +230,8 @@ class MWindowFuncs():
         self.ui.description_input_label.setText(state.tasks[taskId]['description'])
         self.ui.at_timeedit.setTime(at_time)
         self.ui.due_timeedit.setTime(due_time)
+
+        self.check_completion()
         ### repeatable repeatable setting
         if state.tasks[state.cur_task]['repeatable']['is_repeatable']:
             self.ui.repeatable_set_widget.setVisible(True)
@@ -253,13 +267,14 @@ class MWindowFuncs():
             self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle.svg'))
         ### steps stting
         if task_no not in range(self.ui.steps_stack.count()):
+            print('hey hey1')
             task_step_page = QWidget()
             task_step_page_layout = QVBoxLayout(task_step_page)
             state.tasks[taskId]['taskSteps']['page'] = task_step_page
 
             self.ui.steps_stack.addWidget(task_step_page)
 
-        self.ui.steps_label.setText(f'{taskId} steps')
+        self.ui.steps_label.setText(f'{task_name} steps')
         self.ui.steps_stack.setCurrentIndex(task_no)
 
         self.ui.steps_stack.setMaximumHeight(self.ui.steps_stack.currentWidget().layout().sizeHint().height())
@@ -293,22 +308,25 @@ class MWindowFuncs():
         prev = state.tasks[state.cur_task]['duration'][0]
         cur_task_widget = state.tasks[state.cur_task]['taskWidget']
 
-        state.tasks[state.cur_task]['duration'][0] = convert_qtTime_int(at_time)
+        at_time_converted = convert_qtTime_int(at_time)
+        state.tasks[state.cur_task]['duration'][0] = at_time_converted
 
-        cur_task_widget.start_time = convert_qtTime_int(at_time)
+        cur_task_widget.start_time = at_time_converted
 
-        cursor.execute('''UPDATE users at_time WHERE user = ? AND taskName = ?''')
+        cursor.execute('''UPDATE users SET at_time=? WHERE user=? AND id=?''', (at_time_converted, user, state.cur_task))
 
-
-        if convert_qtTime_int(at_time) > due_time:
+        if at_time_converted > due_time:
             state.tasks[state.cur_task]['duration'][1] = convert_qtTime_int(at_time)
             cur_task_widget.end_time = convert_qtTime_int(at_time)
 
+            cursor.execute('''UPDATE users SET due_time=? WHERE user=? AND id=?''',
+                           (at_time_converted, user, state.cur_task))
+
             self.ui.due_timeedit.setTime(at_time)
         cur_task_widget.update_duration()
-
+        conn.commit()
         if state.tasks[state.cur_task]['repeatable']['next_occurrence'] is not None:
-            difference = prev.secsTo(at_time)
+            difference = prev - convert_qtTime_int(at_time)
 
             state.tasks[state.cur_task]['repeatable']['next_occurrence'] += difference
 
@@ -317,30 +335,40 @@ class MWindowFuncs():
 
             self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
 
-
     def edit_endtime(self):
         due_time = self.ui.due_timeedit.time()
         at_time = state.tasks[state.cur_task]['duration'][0]
 
-        state.tasks[state.cur_task]['duration'][1] = convert_qtTime_int(due_time)
+        due_time_converted = convert_qtTime_int(due_time)
+        state.tasks[state.cur_task]['duration'][1] = due_time_converted
+
+        cursor.execute('''UPDATE users SET due_time=? WHERE user=? AND id=?''',
+                       (due_time_converted, user, state.cur_task))
 
         cur_task_widget = state.tasks[state.cur_task]['taskWidget']
-        cur_task_widget.end_time = convert_qtTime_int(due_time)
+        cur_task_widget.end_time = due_time_converted
         print(state.tasks[state.cur_task]['duration'])
         print(due_time)
 
-        if convert_qtTime_int(due_time) < at_time:
+        if due_time_converted < at_time:
             state.tasks[state.cur_task]['duration'][0] = convert_qtTime_int(due_time)
             cur_task_widget.start_time = convert_qtTime_int(due_time)
 
+            cursor.execute('''UPDATE users SET at_time=? WHERE user=? AND id=?''',
+                           (due_time_converted, user, state.cur_task))
             self.ui.at_timeedit.setTime(due_time)
 
         cur_task_widget.update_duration()
+        conn.commit()
 
     def toggle_mw_repeatable_menu(self):
         status = self.ui.repeatable_toggle._checked
         self.ui.repeatable_set_widget.setVisible(status)
         state.tasks[state.cur_task]['repeatable']['is_repeatable'] = status
+
+        cursor.execute('''UPDATE users SET repeatable=? WHERE user=? AND id=?''',
+                       (status, user, state.cur_task))
+        conn.commit()
 
     def set_mw_every_stack(self, vals):
         cur_option = self.ui.every_box.currentText()
@@ -397,6 +425,14 @@ class MWindowFuncs():
             self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
             self.ui.repeatable_edit_info_widget.setEnabled(False)
 
+            rep_vals_db = ''
+            for val in rep_vals:
+                rep_vals_db += f'{val} '
+            cursor.execute('''UPDATE users SET rep_option=?, rep_vals=? WHERE user=? AND id=?''',
+                           (rep_option, rep_vals_db, user, state.cur_task))
+
+            conn.commit()
+
     def complete_task(self, task_name = None):
         if task_name is None:
             task_name = state.cur_task
@@ -405,12 +441,12 @@ class MWindowFuncs():
             return
         if task_name == state.cur_task:
             state.tasks[state.cur_task]['completed'] = not state.tasks[state.cur_task]['completed']
-            if state.tasks[state.cur_task]['completed']:
-                self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
-                state.tasks[state.cur_task]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
-            else:
-                self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle.svg'))
-                state.tasks[state.cur_task]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle.svg'))
+
+            cursor.execute('''UPDATE users SET completed=? WHERE user=? AND id=?''',
+                           (state.tasks[state.cur_task]['completed'], user, state.cur_task))
+            conn.commit()
+
+            self.check_completion()
 
         else:
             state.tasks[task_name]['completed'] = not state.tasks[task_name]['completed']
@@ -418,6 +454,15 @@ class MWindowFuncs():
                 state.tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
             else:
                 state.tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle.svg'))
+
+    def check_completion(self):
+        if state.tasks[state.cur_task]['completed']:
+            self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
+            state.tasks[state.cur_task]['taskWidget'].task.task_check.setIcon(
+                QIcon('sources/icons_white/circle-check-big.svg'))
+        else:
+            self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle.svg'))
+            state.tasks[state.cur_task]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle.svg'))
 
     def update_progress_bar(self):
 
@@ -440,15 +485,23 @@ class MWindowFuncs():
         task_step = TaskStep(parent=task_page)
         task_page_layout.addWidget(task_step.taskstep)
 
-        state.tasks[state.cur_task]['taskSteps']['steps'][task_step] = False
+        state.tasks[state.cur_task]['taskSteps']['steps'][task_step.name] = False
 
+        taskstep_data = ''
+        for step in state.tasks[state.cur_task]['taskSteps']['steps']:
+            completed = state.tasks[state.cur_task]['taskSteps']['steps'][task_step.name]
+            taskstep_data += f'{step}{int(completed)}@@'
+
+        cursor.execute('''UPDATE users SET task_steps_infos=? WHERE user=? AND id=?''',
+                       (taskstep_data, user, state.cur_task))
+        conn.commit()
         self.update_progress_bar()
 
         self.ui.steps_stack.setMaximumHeight(self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
         self.ui.steps_stack.updateGeometry()
 
     def setEmptyPage(self, name):
-        self.ui.tasks_scrollwidget.layout().removeWidget(state.tasks[id]['taskWidget'])
+        self.ui.tasks_scrollwidget.layout().removeWidget(state.tasks[state.cur_task]['taskWidget'])
 
         self.ui.task_info_stack.setCurrentWidget(self.ui.empty_page)
         self.ui.task_info_stack.setVisible(False)

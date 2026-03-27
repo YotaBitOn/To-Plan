@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users (
     category TEXT,
     completed INTEGER,
     repeatable INTEGER,
-    rep_option TEXT,
+    rep_option INTEGER,
     rep_vals TEXT,
     task_steps_infos TEXT, 
     description TEXT
