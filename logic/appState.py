@@ -1,16 +1,14 @@
 import datetime
-from data.init_db import conn, cursor
-from config.env_loader import user
-from logic.core import calculate_next_occurrence
 
+from config.env_loader import cur_theme
 
 class AppState:
     def __init__(self):
         self.cur_task = 0
-        self.cur_date = datetime.datetime.now(datetime.timezone.utc).timestamp()
-
         self.task_ammo = 0
         self.tasks = {}
+
+        self.cur_date = datetime.datetime.now(datetime.timezone.utc).timestamp()
         self.dates = []
 
     def print_tasks(self):

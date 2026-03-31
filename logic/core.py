@@ -1,9 +1,8 @@
 import datetime
-
+from config.env_loader import data
 from PySide6.QtCore import QDate, QDateTime, QTime
 
 #variables
-from config.constants import mounth_number
 
 def calculate_next_occurrence_raw(rep_type, rep_vals, at_time):
     cur_date = QDate.currentDate()
@@ -29,7 +28,7 @@ def calculate_next_occurrence_raw(rep_type, rep_vals, at_time):
         cur_year = QDate(cur_date.year(), 1, 1)
         cur_year_stamp = QDateTime(cur_year, QTime(0, 0, 0)).toSecsSinceEpoch() + at_time
 
-        req_date = QDate(cur_date.year()+1, mounth_number[rep_vals[1]], int(rep_vals[0]))
+        req_date = QDate(cur_date.year()+1, data['mounth_number'][rep_vals[1]], int(rep_vals[0]))
 
         next_occurrence = cur_year_stamp + 86400 * cur_year.daysTo(req_date)
 
@@ -71,7 +70,7 @@ def calculate_next_occurrence(rep_type, at_time, caller):
         cur_year_stamp = QDateTime(cur_year, at_time).toSecsSinceEpoch()
 
         day_value = int(caller.ui.day_edit.text())
-        mounth_value = mounth_number[caller.ui.mounth_edit.currentText()]
+        mounth_value = data['mounth_number'][caller.ui.mounth_edit.currentText()]
 
         rep_vals.append(day_value)
         rep_vals.append(caller.ui.mounth_edit.currentText())

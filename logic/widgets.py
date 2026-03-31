@@ -6,8 +6,7 @@ from PySide6.QtCore import QEvent, Qt, QPropertyAnimation, Property, QEasingCurv
 from PySide6.QtWidgets import QWidget
 
 #variables
-from config.env_loader import task_widget_ui, task_step_ui, user
-from config.constants import icons, palette, diff_col
+from config.env_loader import task_widget_ui, task_step_ui, user, data
 from data.init_db import cursor, conn
 from logic.appState import state
 
@@ -36,8 +35,8 @@ class Task(QWidget):
         self.end_time  = end_time
 
         self.task.task_duration.setText(f'{datetime.datetime.fromtimestamp(self.start_time).strftime("%H:%M")} - {datetime.datetime.fromtimestamp(self.end_time).strftime("%H:%M")}')
-        self.task.categ_icon.setIcon(QIcon(f"sources/icons_white/{icons[category]}"))
-        bg_color = palette[diff_col[difficulty]]
+        self.task.categ_icon.setIcon(QIcon(f"sources/icons_white/{data['icons'][category]}"))
+        bg_color = data['palette'][data['diff_col'][difficulty]]
         self.task.setStyleSheet(f"""background-color: {bg_color}; border-radius: 20px;""")
 
         self.task.setMouseTracking(True)
@@ -82,7 +81,7 @@ class TaskStep():
         self.taskstep = QUiLoader().load(task_step_ui, None)
         self.completed = False
         self.taskstep.stackedWidget.setCurrentIndex(0)
-        self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {palette['black']};""")
+        self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {data['palette'][data['theme'][data['cur_theme']]['field']]};""")
 
         self.taskstep.task_step_label.setText(f'{self.name}')
 
@@ -91,6 +90,9 @@ class TaskStep():
         self.taskstep.task_step_edit.clicked.connect(lambda : self.edit_name())
         self.taskstep.task_step_delete.clicked.connect(lambda : self.deconstruct())
 
+        signals.change_theme.connect(lambda : self.taskstep.stackedWidget.setStyleSheet(f"""
+        background-color: {data['palette'][data['theme'][data['cur_theme']]['field']]};""")
+)
     def confirm_name(self):
         prev_name = self.name
         self.name = self.taskstep.lineEdit.text()

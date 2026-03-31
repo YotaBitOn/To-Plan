@@ -1,3 +1,5 @@
+import json
+
 from dotenv import load_dotenv
 import os
 
@@ -16,3 +18,9 @@ user = os.getenv('user')
 
 #mode
 drop_db_mode = int(os.getenv('drop_db_mode'))
+
+#config
+with open("config/config.json", "r") as f:
+    data = json.load(f)
+
+cur_theme = data['cur_theme']

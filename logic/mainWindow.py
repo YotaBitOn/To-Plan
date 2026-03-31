@@ -1,4 +1,5 @@
 import datetime
+import json
 from traceback import print_tb
 
 from PySide6.QtCore import QDateTime, Qt
@@ -7,7 +8,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
 from PySide6.QtUiTools import QUiLoader
 
 #variables
-from config.env_loader import main_ui, user
+from config.env_loader import main_ui, user, data
 from data.init_db import cursor, conn
 from logic.appState import state
 
@@ -26,17 +27,19 @@ class MainWindow(QMainWindow):
         self.ui = QUiLoader().load(main_ui, None)
         self.funcs = MWindowFuncs(ui=self.ui)
 
-        self.setStart()
+        self.setUI()
         self.setCustomWidgets()
         self.loadTasks()
         self.linkFuncs()
         #self.ui.show())
 
-    def setStart(self):
+    def setUI(self):
         self.ui.task_step_progress.setVisible(False)
         self.ui.task_info_stack.setVisible(False)
 
-        # self.ui.tabWidget.setCurrentIndex(0)
+        self.ui.theme_box.setCurrentText(data['cur_theme'])
+
+        self.funcs.setTheme()
 
     def setCustomWidgets(self):
         from logic.widgets import  AnimatedToggle
@@ -67,6 +70,8 @@ class MainWindow(QMainWindow):
         self.ui.tasks_prev_button.clicked.connect(lambda x: self.funcs.change_date(-1))
         self.ui.tasks_next_button.clicked.connect(lambda x: self.funcs.change_date(1))
 
+        #settings related
+        self.ui.theme_box.currentTextChanged.connect(lambda x: self.funcs.changeTheme())
 
     def loadTasks(self):
         ### task widget setting
@@ -297,7 +302,7 @@ class MWindowFuncs():
         state.tasks[taskId]['taskDate']['page'] = date_page
         date_page.layout().addWidget(state.tasks[taskId]['taskWidget'].task)
         self.ui.task_list_stack.setCurrentWidget(date_page)
-#       ###
+
     def edit_starttime(self):
         if state.cur_task is None:
             return
@@ -526,4 +531,123 @@ class MWindowFuncs():
         self.ui.tasks_date_label.setText(new_date_str)
         self.ui.task_list_stack.setCurrentWidget(date_page)
 
+    def changeTheme(self):
+        print(data['cur_theme'], end=' -> ')
+        data['cur_theme'] = self.ui.theme_box.currentText()
+
+        data['cur_theme'] = data['cur_theme']
+        print(data['cur_theme'])
+        with open("config/config.json", "w") as f:
+            json.dump(data, f, indent=4)
+
+        self.setTheme()
+
+        signals.change_theme.emit()
+    def setTheme(self):
+        main_color = data['palette'][data['theme'][data['cur_theme']]['main']]
+        section_color = data['palette'][data['theme'][data['cur_theme']]['section']]
+        button_color = data['palette'][data['theme'][data['cur_theme']]['button']]
+        field_color = data['palette'][data['theme'][data['cur_theme']]['field']]
+        text_color = data['palette'][data['theme'][data['cur_theme']]['text']]
+
+        #main
+        self.ui.setStyleSheet(f'''background-color:{main_color};
+                                color:{text_color};''')
+
+
+        #sections
+        self.ui.main_info_widget.setStyleSheet(f'''background-color:{section_color};
+                                color:{text_color};
+                                border-radius: 40px;''')
+
+        self.ui.task_steps_widget.setStyleSheet(f'''background-color:{section_color};
+                                        color:{text_color};
+                                        border-radius: 40px;''')
+
+        self.ui.repeatable_widget.setStyleSheet(f'''background-color:{section_color};
+                                        color:{text_color};
+                                        border-radius: 40px;''')
+
+        self.ui.task_graphs_widget.setStyleSheet(f'''background-color:{section_color};
+                                        color:{text_color};
+                                        border-radius: 40px;''')
+
+        self.ui.tasks_date.setStyleSheet(f'''background-color:{section_color};
+                                        color:{text_color};
+                                        border: none;
+                                        border-radius: 15px;''')
+        #buttons
+        self.ui.add_task_button.setStyleSheet(f'''background-color:{button_color};
+                                                color:{text_color};
+                                                border: none;
+                                                border-radius: 15px;''')
+
+        self.ui.add_task_step_button.setStyleSheet(f'''background-color:{button_color};
+                                                        color:{text_color};
+                                                        border: none;
+                                                        border-radius: 15px;''')
+
+        self.ui.edit_repeatable_button.setStyleSheet(f'''background-color:{button_color};
+                                                        color:{text_color};
+                                                        border: none;
+                                                        border-radius: 15px;''')
+
+        self.ui.delete_task.setStyleSheet(f'''background-color:{button_color};
+                                                        color:{text_color};
+                                                        border: none;
+                                                        border-radius: 15px;''')
+        #fields
+        self.ui.at_timeedit.setStyleSheet(f'''background-color:{field_color};
+                                        color:{text_color};
+                                        border: none;
+                                        border-radius: 10px;''')
+
+        self.ui.due_timeedit.setStyleSheet(f'''background-color:{field_color};
+                                                color:{text_color};
+                                                border: none;
+                                                border-radius: 10px;''')
+
+        self.ui.every_box.setStyleSheet(f'''background-color:{field_color};
+                                        color:{text_color};''')
+
+        self.ui.day_edit_2.setStyleSheet(f'''background-color:{field_color};
+                                                color:{text_color};''')
+
+        self.ui.day_edit.setStyleSheet(f'''background-color:{field_color};
+                                        color:{text_color};''')
+
+        self.ui.mounth_edit.setStyleSheet(f'''background-color:{field_color};
+                                                color:{text_color};''')
+
+        self.ui.few_days_edit.setStyleSheet(f'''background-color:{field_color};
+                                        color:{text_color};''')
+
+        self.ui.description_text_edit.setStyleSheet(f'''background-color:{field_color};
+                                                color:{text_color};''')
+
+        self.ui.difficulty_combobox.setStyleSheet(f'''background-color:{field_color};
+                                              color:{text_color};''')
+
+        self.ui.category_combobox.setStyleSheet(f'''background-color:{field_color};
+                                                color:{text_color};''')
+
+        self.ui.description_input_label.setStyleSheet(f'''background-color:{field_color};
+                                                color:{text_color};''')
+
+
+        self.ui.description_input_label.setStyleSheet(f"""
+        QWidget{{
+        background-color: {field_color};
+        border: none;
+        border-radius: 10px;
+        }}
+        
+        QPushButton{{
+        background-color: rgba(255, 255, 255, 0);
+        border: 2px solid white;
+        border-radius: 25px;
+        }}""")
+
+
 mw = MainWindow()
+

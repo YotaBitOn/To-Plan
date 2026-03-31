@@ -9,6 +9,7 @@ class AppSignals(QObject):
     complete_task = Signal(str)
     setEmptyPage = Signal(str)
 
+    change_theme = Signal()
     def __init__(self):
         super().__init__()
 
