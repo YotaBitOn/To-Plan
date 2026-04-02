@@ -15,7 +15,7 @@
     },
     "cur_theme": "dark",
     "cur_lang": "ua",
-    "panel_location": "Left",
+    "panel_pos": "North",
     "theme": {
         "dark": {
             "main": "black",

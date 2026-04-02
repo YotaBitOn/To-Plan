@@ -4,7 +4,7 @@ from traceback import print_tb
 
 from PySide6.QtCore import QDateTime, Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget
 from PySide6.QtUiTools import QUiLoader
 
 #variables
@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
 
         self.funcs.setTheme()
         self.funcs.setLang()
+        self.funcs.setPanelPos()
 
     def setCustomWidgets(self):
         from logic.widgets import  AnimatedToggle
@@ -72,9 +73,11 @@ class MainWindow(QMainWindow):
         self.ui.tasks_prev_button.clicked.connect(lambda x: self.funcs.change_date(-1))
         self.ui.tasks_next_button.clicked.connect(lambda x: self.funcs.change_date(1))
 
-        #settings related lang_box
+        #settings related
         self.ui.theme_box.currentTextChanged.connect(lambda x: self.funcs.changeTheme())
         self.ui.lang_box.currentTextChanged.connect(lambda x: self.funcs.changeLang())
+
+        self.ui.panel_loc_box.currentTextChanged.connect(lambda x: self.funcs.changePanelPos())
 
     def loadTasks(self):
         ### task widget setting
@@ -671,7 +674,6 @@ class MWindowFuncs():
 
     def setLang(self):
 
-
         cur_lang = data['cur_lang']
 
         with open(f"config/langs/{cur_lang}.json", "r") as f:
@@ -878,5 +880,30 @@ class MWindowFuncs():
         self.ui.theme_box.blockSignals(True)
         self.ui.theme_box.setCurrentIndex(self.ui.theme_box.findData(data['cur_theme']))
         self.ui.theme_box.blockSignals(False)
+
+    def changePanelPos(self):
+        data['panel_pos'] = self.ui.panel_loc_box.currentData()
+
+        with open("config/config.json", "w") as f:
+            json.dump(data, f, indent=4)
+
+        self.setPanelPos()
+
+    def setPanelPos(self):
+        if data['panel_pos'] == 'West':
+            self.ui.tabWidget.setTabPosition(QTabWidget.West)
+
+        if data['panel_pos'] == 'East':
+            self.ui.tabWidget.setTabPosition(QTabWidget.East)
+
+        if data['panel_pos'] == 'North':
+            self.ui.tabWidget.setTabPosition(QTabWidget.North)
+
+        if data['panel_pos'] == 'South':
+            self.ui.tabWidget.setTabPosition(QTabWidget.South)
+
+
+
+
 mw = MainWindow()
 

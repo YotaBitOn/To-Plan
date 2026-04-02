@@ -31,7 +31,7 @@ def calculate_next_occurrence_raw(rep_type, rep_vals, at_time):
         cur_year = QDate(cur_date.year(), 1, 1)
         cur_year_stamp = QDateTime(cur_year, QTime(0, 0, 0)).toSecsSinceEpoch() + at_time
 
-        req_date = QDate(cur_date.year()+1, data['mounth_number'][rep_vals[1]], int(rep_vals[0]))
+        req_date = QDate(cur_date.year()+1, int(rep_vals[1]), int(rep_vals[0]))
 
         next_occurrence = cur_year_stamp + 86400 * cur_year.daysTo(req_date)
 
