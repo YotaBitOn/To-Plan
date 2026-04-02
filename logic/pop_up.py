@@ -35,7 +35,7 @@ class Popup():
         #self.show_add_task_popup()
 
     def show_add_task_popup(self):
-        print('show_add_task_popup')
+
         self.ui.repeatable_widget.setVisible(False)
         self.ui.every_stack.setCurrentWidget(self.ui.day)
         self.ui.every_stack.setVisible(False)
@@ -49,19 +49,19 @@ class Popup():
         cur_option = self.ui.every_box.currentText()
 
         self.ui.every_stack.setVisible(True)
-        if cur_option == 'Few Days':
+        if cur_option == 'few_days':
             self.ui.every_stack.setCurrentWidget(self.ui.few_days)
 
-        elif cur_option == 'Week':
+        elif cur_option == 'week':
             self.ui.every_stack.setCurrentWidget(self.ui.week)
 
-        elif cur_option == 'Mounth':
+        elif cur_option == 'month':
             self.ui.every_stack.setCurrentWidget(self.ui.mounth)
 
-        elif cur_option == 'Year':
+        elif cur_option == 'year':
             self.ui.every_stack.setCurrentWidget(self.ui.year)
 
-        elif cur_option == 'Day':
+        elif cur_option == 'day':
             self.ui.every_stack.setCurrentWidget(mw.day)
             self.ui.every_stack.setVisible(False)
 
@@ -72,6 +72,7 @@ class Popup():
 
         state.cur_task = taskId
         _task_repeatable = self.ui.repeatable_toggle._checked
+
         if _task_name == '':
             _task_name = f"Task #{state.task_ammo}"
 
@@ -89,11 +90,7 @@ class Popup():
             mw.ui.repeatable_set_widget.setVisible(True)
 
             rep_option = self.ui.every_box.currentIndex()
-            next_occurrence, rep_vals = (calculate_next_occurrence(
-                self.ui.every_box.currentText(),
-                self.ui.at_timeedit.time(),
-                popup
-            ))
+            next_occurrence, rep_vals = (calculate_next_occurrence(self))
             mw.ui.every_box.setCurrentIndex(self.ui.every_box.currentIndex())
             mw.funcs.set_mw_every_stack(rep_vals)
         else:

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1226</width>
+    <width>1122</width>
     <height>798</height>
    </rect>
   </property>
@@ -34,7 +34,7 @@
       </property>
       <property name="font">
        <font>
-        <pointsize>20</pointsize>
+        <pointsize>18</pointsize>
        </font>
       </property>
       <property name="styleSheet">
@@ -180,7 +180,7 @@ QPushButton:checked {
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>446</width>
+               <width>406</width>
                <height>568</height>
               </rect>
              </property>
@@ -284,8 +284,8 @@ border-radius: 15px;</string>
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>0</y>
-                 <width>640</width>
+                 <y>-660</y>
+                 <width>580</width>
                  <height>1863</height>
                 </rect>
                </property>
@@ -448,7 +448,7 @@ QPushButton:checked {
                      <item>
                       <widget class="QStackedWidget" name="category_stack">
                        <property name="currentIndex">
-                        <number>0</number>
+                        <number>1</number>
                        </property>
                        <widget class="QWidget" name="category_edit_page">
                         <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -1281,6 +1281,9 @@ border-radius: 10px;</string>
                          </item>
                          <item>
                           <widget class="QStackedWidget" name="every_stack">
+                           <property name="enabled">
+                            <bool>false</bool>
+                           </property>
                            <property name="sizePolicy">
                             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                              <horstretch>0</horstretch>
@@ -1306,7 +1309,7 @@ border-radius: 10px;</string>
                            </property>
                            <property name="styleSheet">
                             <string notr="true">QWidget{
-background-color: rgb(16,16,16);
+background-color: rgb(16,216,16);
 border: none;
 border-radius: 10px;
 }
@@ -1320,7 +1323,7 @@ border-radius: 25px;
 </string>
                            </property>
                            <property name="currentIndex">
-                            <number>3</number>
+                            <number>0</number>
                            </property>
                            <widget class="QWidget" name="day">
                             <property name="minimumSize">
@@ -1390,6 +1393,9 @@ border-radius: 25px;
                              </item>
                              <item>
                               <widget class="QLineEdit" name="few_days_edit">
+                               <property name="enabled">
+                                <bool>false</bool>
+                               </property>
                                <property name="sizePolicy">
                                 <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
                                  <horstretch>0</horstretch>
@@ -1400,6 +1406,10 @@ border-radius: 25px;
                                 <font>
                                  <pointsize>20</pointsize>
                                 </font>
+                               </property>
+                               <property name="styleSheet">
+                                <string notr="true">background-color: rgb(21, 0, 255);
+color: rgb(200, 255, 0);</string>
                                </property>
                               </widget>
                              </item>
@@ -1612,7 +1622,7 @@ border-radius: 25px;</string>
                               <number>10</number>
                              </property>
                              <item>
-                              <widget class="QLabel" name="label_4">
+                              <widget class="QLabel" name="on_day_label">
                                <property name="font">
                                 <font>
                                  <pointsize>20</pointsize>
@@ -2319,7 +2329,7 @@ border-radius: 15px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1123</width>
+             <width>1023</width>
              <height>1726</height>
             </rect>
            </property>
@@ -2583,7 +2593,7 @@ border-radius: 15px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1137</width>
+             <width>1037</width>
              <height>712</height>
             </rect>
            </property>
@@ -3027,7 +3037,7 @@ border-radius: 100px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>372</width>
+                 <width>338</width>
                  <height>298</height>
                 </rect>
                </property>
@@ -3303,7 +3313,7 @@ border-radius: 15px;
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>733</width>
+                  <width>667</width>
                   <height>196</height>
                  </rect>
                 </property>
@@ -3442,7 +3452,7 @@ border-radius: 15px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1226</width>
+     <width>1122</width>
      <height>22</height>
     </rect>
    </property>

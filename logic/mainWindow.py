@@ -37,9 +37,10 @@ class MainWindow(QMainWindow):
         self.ui.task_step_progress.setVisible(False)
         self.ui.task_info_stack.setVisible(False)
 
-        self.ui.theme_box.setCurrentText(data['cur_theme'])
+        self.ui.theme_box.setCurrentText(data['cur_theme']) #!
 
         self.funcs.setTheme()
+        self.funcs.setLang()
 
     def setCustomWidgets(self):
         from logic.widgets import  AnimatedToggle
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow):
 
         #task related
         self.ui.delete_task.clicked.connect(lambda x: state.tasks[state.cur_task]['taskWidget'].deconstruct())
+        #!
         self.ui.every_box.currentTextChanged.connect(lambda x: self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals']) )
         self.ui.repeatable_toggle.toggled.connect(lambda x: self.funcs.toggle_mw_repeatable_menu())
         self.ui.task_complete_button.clicked.connect(lambda x: self.funcs.complete_task(state.cur_task))
@@ -70,8 +72,9 @@ class MainWindow(QMainWindow):
         self.ui.tasks_prev_button.clicked.connect(lambda x: self.funcs.change_date(-1))
         self.ui.tasks_next_button.clicked.connect(lambda x: self.funcs.change_date(1))
 
-        #settings related
+        #settings related lang_box
         self.ui.theme_box.currentTextChanged.connect(lambda x: self.funcs.changeTheme())
+        self.ui.lang_box.currentTextChanged.connect(lambda x: self.funcs.changeLang())
 
     def loadTasks(self):
         ### task widget setting
@@ -123,7 +126,7 @@ class MainWindow(QMainWindow):
 
                 state.cur_task = taskId
 
-                print(startTime, endTime)
+
                 state.tasks[taskId] = {
                     'taskName': name,
                     'taskNo' : state.task_ammo,
@@ -159,7 +162,7 @@ class MainWindow(QMainWindow):
 
                     self.ui.steps_stack.addWidget(task_step_page)
                     self.ui.task_step_progress.setVisible(True)
-                    print('lf', state.tasks[taskId]['taskSteps']['page'])
+
 
                     for step in taskSteps.split('@@')[:-1]:
 
@@ -192,8 +195,9 @@ class MainWindow(QMainWindow):
 
                     next_occurrence_date = datetime.datetime.fromtimestamp(next_occurrence).strftime("%d.%m.%Y")
                     next_occurrence_time = datetime.datetime.fromtimestamp(next_occurrence).strftime("%H:%M")
-                    print('HEEEEEEEEEEEEEEY', rep_vals, rep_option, next_occurrence_date)
+
                     self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+                    #!
                     self.ui.every_box.setCurrentIndex(state.tasks[state.cur_task]['repeatable']['rep_option'])
                     self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals'])
 
@@ -249,7 +253,7 @@ class MWindowFuncs():
             next_occurrence_time =  datetime.datetime.fromtimestamp(state.tasks[state.cur_task]['repeatable']['next_occurrence']).strftime("%H:%M")
 
             self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
-
+            #!
             self.ui.every_box.setCurrentIndex(state.tasks[state.cur_task]['repeatable']['rep_option'])
             self.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals'])
         else:
@@ -272,7 +276,7 @@ class MWindowFuncs():
             self.ui.task_complete_button.setIcon(QIcon('sources/icons_white/circle.svg'))
         ### steps stting
         if task_no not in range(self.ui.steps_stack.count()):
-            print('hey hey1')
+
             task_step_page = QWidget()
             task_step_page_layout = QVBoxLayout(task_step_page)
             state.tasks[taskId]['taskSteps']['page'] = task_step_page
@@ -352,8 +356,8 @@ class MWindowFuncs():
 
         cur_task_widget = state.tasks[state.cur_task]['taskWidget']
         cur_task_widget.end_time = due_time_converted
-        print(state.tasks[state.cur_task]['duration'])
-        print(due_time)
+
+
 
         if due_time_converted < at_time:
             state.tasks[state.cur_task]['duration'][0] = convert_qtTime_int(due_time)
@@ -376,50 +380,58 @@ class MWindowFuncs():
         conn.commit()
 
     def set_mw_every_stack(self, vals):
-        cur_option = self.ui.every_box.currentText()
+        cur_option = self.ui.every_box.currentData()
 
         self.ui.every_stack.setVisible(True)
-        if cur_option == 'Few Days':
+        if cur_option == 'few_days':
             self.ui.every_stack.setCurrentWidget(self.ui.few_days)
+            if vals:
+                self.ui.few_days_edit.setText(str(vals[0]))
 
-            self.ui.few_days_edit.setText(str(vals[0]))
-
-        elif cur_option == 'Week':
+        elif cur_option == 'week':
             self.ui.every_stack.setCurrentWidget(self.ui.week)
             # to do
 
-        elif cur_option == 'Mounth':
+        elif cur_option == 'month':
             self.ui.every_stack.setCurrentWidget(self.ui.mounth)
 
-            self.ui.day_edit_2.setText(str(vals[0]))
+            if vals:
+                self.ui.day_edit_2.setText(str(vals[0]))
 
-        elif cur_option == 'Year':
+        elif cur_option == 'year':
             self.ui.every_stack.setCurrentWidget(self.ui.year)
 
-            self.ui.day_edit.setText(str(vals[0]))
-            self.ui.mounth_edit.setCurrentText(vals[1])
+            if vals:
+                self.ui.day_edit.setText(str(vals[0]))
+                if len(vals) > 1:
+                    self.ui.mounth_edit.setCurrentText(vals[1])
 
-        elif cur_option == 'Day':
+        elif cur_option == 'day':
             self.ui.every_stack.setCurrentWidget(self.ui.day)
             self.ui.every_stack.setVisible(False)
 
     def edit_repeatable(self):
         if self.ui.edit_repeatable_button.mode == 'edit':
+
+
             self.ui.edit_repeatable_button.mode = 'apply'
             self.ui.edit_repeatable_button.setIcon(QIcon('sources/icons_white/check.svg'))
 
             self.ui.repeatable_edit_info_widget.setEnabled(True)
+
+            for child in self.ui.repeatable_edit_info_widget.findChildren(QWidget):
+                child.setEnabled(True)
+
+
+
+
         elif self.ui.edit_repeatable_button.mode == 'apply':
             self.ui.edit_repeatable_button.mode = 'edit'
             self.ui.edit_repeatable_button.setIcon(QIcon('sources/icons_white/pencil.svg'))
 
             rep_option = self.ui.every_box.currentIndex()
-            next_occurrence, rep_vals = (calculate_next_occurrence(
-                self.ui.every_box.currentText(),
-                self.ui.at_timeedit.time(),
-                self
-            ))
 
+            next_occurrence, rep_vals = (calculate_next_occurrence(self))
             state.tasks[state.cur_task]['repeatable']['rep_option'] = rep_option
             state.tasks[state.cur_task]['repeatable']['rep_vals'] = rep_vals
             state.tasks[state.cur_task]['repeatable']['next_occurrence'] = next_occurrence
@@ -429,6 +441,8 @@ class MWindowFuncs():
 
             self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
             self.ui.repeatable_edit_info_widget.setEnabled(False)
+            for child in self.ui.repeatable_edit_info_widget.findChildren(QWidget):
+                child.setEnabled(False)
 
             rep_vals_db = ''
             for val in rep_vals:
@@ -484,7 +498,7 @@ class MWindowFuncs():
     def add_task_step(self):
         #mw.steps_stack.setVisible(True)
         self.ui.task_step_progress.setVisible(True)
-        print(state.cur_task)
+
         task_page = state.tasks[state.cur_task]['taskSteps']['page']
         task_page_layout = task_page.layout()
         task_step = TaskStep(parent=task_page)
@@ -532,18 +546,17 @@ class MWindowFuncs():
         self.ui.task_list_stack.setCurrentWidget(date_page)
 
     def changeTheme(self):
-        print(data['cur_theme'], end=' -> ')
-        data['cur_theme'] = self.ui.theme_box.currentText()
+        data['cur_theme'] = self.ui.theme_box.currentData()
 
-        data['cur_theme'] = data['cur_theme']
-        print(data['cur_theme'])
         with open("config/config.json", "w") as f:
             json.dump(data, f, indent=4)
 
         self.setTheme()
 
         signals.change_theme.emit()
+
     def setTheme(self):
+
         main_color = data['palette'][data['theme'][data['cur_theme']]['main']]
         section_color = data['palette'][data['theme'][data['cur_theme']]['section']]
         button_color = data['palette'][data['theme'][data['cur_theme']]['button']]
@@ -635,7 +648,7 @@ class MWindowFuncs():
                                                 color:{text_color};''')
 
 
-        self.ui.description_input_label.setStyleSheet(f"""
+        self.ui.every_stack.setStyleSheet(f"""
         QWidget{{
         background-color: {field_color};
         border: none;
@@ -648,6 +661,222 @@ class MWindowFuncs():
         border-radius: 25px;
         }}""")
 
+    def changeLang(self):
+        data['cur_lang'] = self.ui.lang_box.currentData()
 
+        with open("config/config.json", "w") as f:
+            json.dump(data, f, indent=4)
+
+        self.setLang()
+
+    def setLang(self):
+
+
+        cur_lang = data['cur_lang']
+
+        with open(f"config/langs/{cur_lang}.json", "r") as f:
+            lang = json.load(f)
+
+        translations_map = {
+            # Tasks
+            self.ui.difficulty_label: "difficulty.label",
+            self.ui.category_label: "category.label",
+            self.ui.description_label: "task.description",
+            self.ui.duration_label: "task.duration",
+            self.ui.steps_label: "task.steps",
+            self.ui.repeatable_label: "repeatable.label",
+            self.ui.next_time_label: "repeatable.next_occurrence",
+            self.ui.every_label: "repeat.every",
+            self.ui.on_day_label: "repeat.on_day",
+            self.ui.on_label: "repeat.on",
+            self.ui.few_days_label: "repeat.how_many_days",
+
+            # Analytics
+            self.ui.analytics_label: "analytics.label",
+            self.ui.task_widget_label: "analytics.tasks_completed",
+            self.ui.perc_task_label: "analytics.tasks_completion_percent",
+            self.ui.diff_bar_label: "analytics.tasks_by_difficulty",
+            self.ui.diff_pie_label: "analytics.tasks_by_category",
+            self.ui.categ_bar_label: "analytics.difficulty_distribution",
+            self.ui.categ_pie_label: "analytics.category_distribution",
+
+            # Settings
+            self.ui.theme_label: "settings.theme",
+            self.ui.lang_label: "settings.lang",
+            self.ui.panel_loc_label: "settings.panel_location",
+            self.ui.difficulty_enable_label: "settings.show_difficulty",
+            self.ui.category_enable_label: "settings.show_category",
+            self.ui.export_data_button: "settings.export_data",
+            self.ui.contact_dev_button: "settings.contact_dev",
+            self.ui.login_button: "settings.login",
+
+            # User
+            self.ui.cur_goals_label: "user.current_goals",
+            self.ui.choose_tp_label: "user.completed_goals",
+            self.ui.activity_label: "user.tasks_completed",
+        }
+
+        # Apply all translations
+        for widget, key in translations_map.items():
+            widget.setText(lang[key])
+
+        #nav
+        self.ui.tabWidget.setTabText(0, lang["nav.tasks"])
+        self.ui.tabWidget.setTabText(1, lang["nav.analytics"])
+        self.ui.tabWidget.setTabText(2, lang["nav.settings"])
+        self.ui.tabWidget.setTabText(3, lang["nav.user"])
+        self.ui.tabWidget.setTabText(4, lang["nav.clock"])
+
+        #combos
+        combos_map = {
+
+            self.ui.category_combobox: {  #  actually holds difficulty items (names swapped in .ui)
+                'Free': 'free',
+                lang['difficulty.easy']: 'easy',
+                lang['difficulty.medium']: 'medium',
+                lang['difficulty.hard']: 'hard',
+            },
+
+            self.ui.difficulty_combobox: {  #  actually holds category items (names swapped in .ui)
+                lang['category.sport']: 'sport',
+                lang['category.finance']: 'finance',
+                lang['category.education']: 'education',
+                lang['category.health']: 'health',
+                lang['category.social']: 'social',
+                lang['category.meal']: 'meal',
+                lang['category.chores']: 'chores',
+                lang['category.job']: 'job',
+                lang['category.hygiene']: 'hygiene',
+                lang['category.mental']: 'mental',
+                lang['category.rest']: 'rest',
+                lang['category.other']: 'other',
+            },
+
+            self.ui.every_box: {
+                lang['repeat.day']: 'day',
+                lang['repeat.few_days']: 'few_days',
+                lang['repeat.week']: 'week',
+                lang['repeat.month']: 'month',
+                lang['repeat.year']: 'year',
+            },
+
+            self.ui.mounth_edit: {
+                lang['month.january']: 1,
+                lang['month.february']: 2,
+                lang['month.march']: 3,
+                lang['month.april']: 4,
+                lang['month.may']: 5,
+                lang['month.june']: 6,
+                lang['month.july']: 7,
+                lang['month.august']: 8,
+                lang['month.september']: 9,
+                lang['month.october']: 10,
+                lang['month.november']: 11,
+                lang['month.december']: 12,
+            },
+
+            self.ui.choose_way: {
+                lang['repeat.day']: 'day',
+                lang['repeat.week']: 'week',
+                lang['repeat.month']: 'month',
+                lang['repeat.year']: 'year',
+                'All time': 'all',  # no lang key exists for this
+            },
+
+            self.ui.analytics_year_1: {
+                '2026': 2026,
+                '2027': 2027,
+            },
+
+            self.ui.analytics_mounth: {
+                lang['month.january']: 1,
+                lang['month.february']: 2,
+                lang['month.march']: 3,
+                lang['month.april']: 4,
+                lang['month.may']: 5,
+                lang['month.june']: 6,
+                lang['month.july']: 7,
+                lang['month.august']: 8,
+                lang['month.september']: 9,
+                lang['month.october']: 10,
+                lang['month.november']: 11,
+                lang['month.december']: 12,
+            },
+
+            self.ui.analytics_year_2: {
+                '2026': 2026,
+                '2027': 2027,
+            },
+
+            self.ui.lang_box: {
+                'English': 'eng',
+                'Українська': 'ua',
+                'Slovenčina': 'sk',
+            },
+
+            self.ui.panel_loc_box: {
+                'Left': 'West',
+                'Right': 'East',
+                'Top': 'North',
+                'Bottom': 'South',
+            },
+
+            self.ui.theme_box: {
+                lang['settings.theme.dark']: 'dark',
+                lang['settings.theme.light']: 'light',
+            },
+
+            self.ui.choose_dmya_box: {
+                lang['repeat.day']: 'day',
+                lang['repeat.week']: 'week',
+                lang['repeat.month']: 'month',
+                lang['repeat.year']: 'year',
+                'All time': 'all',
+            },
+
+            self.ui.user_year_2: {
+                '2026': 2026,
+                '2027': 2027,
+            },
+
+            self.ui.user_mounth: {
+                lang['month.january']: 1,
+                lang['month.february']: 2,
+                lang['month.march']: 3,
+                lang['month.april']: 4,
+                lang['month.may']: 5,
+                lang['month.june']: 6,
+                lang['month.july']: 7,
+                lang['month.august']: 8,
+                lang['month.september']: 9,
+                lang['month.october']: 10,
+                lang['month.november']: 11,
+                lang['month.december']: 12,
+            },
+
+            self.ui.user_year_1: {
+                '2026': 2026,
+                '2027': 2027,
+            },
+
+        }
+
+
+        for comboBox in combos_map:
+            comboBox.blockSignals(True)
+
+            comboBox.clear()
+            for item in combos_map[comboBox]:
+                comboBox.addItem(item, combos_map[comboBox][item])
+
+            comboBox.blockSignals(False)
+
+        self.ui.lang_box.blockSignals(True)
+        self.ui.lang_box.setCurrentIndex(self.ui.lang_box.findData(cur_lang))
+        self.ui.lang_box.blockSignals(False)
+
+        self.ui.theme_box.blockSignals(True)
+        self.ui.theme_box.setCurrentIndex(self.ui.theme_box.findData(data['cur_theme']))
+        self.ui.theme_box.blockSignals(False)
 mw = MainWindow()
 

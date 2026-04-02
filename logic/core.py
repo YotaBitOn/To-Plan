@@ -9,11 +9,14 @@ def calculate_next_occurrence_raw(rep_type, rep_vals, at_time):
 
     next_occurrence = 0
 
+    if len(rep_vals) == 0 or not rep_vals[0]:
+        rep_vals =  [0,0]
+
     if rep_type == 1:
 
         cur_datetime_stamp = QDateTime(cur_date, QTime(0, 0, 0)).toSecsSinceEpoch() + at_time
 
-        next_occurrence = cur_datetime_stamp + 86400 * rep_vals[0]
+        next_occurrence = cur_datetime_stamp + 86400 * int(rep_vals[0])
 
     elif rep_type == 2:
         return 0
@@ -23,7 +26,7 @@ def calculate_next_occurrence_raw(rep_type, rep_vals, at_time):
         cur_mounth = QDate(cur_date.year(), cur_date.month(), 1)
         cur_mounth_stamp = QDateTime(cur_mounth, QTime(0, 0, 0)).toSecsSinceEpoch() + at_time
 
-        next_occurrence = cur_mounth_stamp + 86400 * (rep_vals[0]-1)
+        next_occurrence = cur_mounth_stamp + 86400 * (int(rep_vals[0])-1)
     elif rep_type == 4:
         cur_year = QDate(cur_date.year(), 1, 1)
         cur_year_stamp = QDateTime(cur_year, QTime(0, 0, 0)).toSecsSinceEpoch() + at_time
@@ -38,13 +41,23 @@ def calculate_next_occurrence_raw(rep_type, rep_vals, at_time):
 
     return next_occurrence
 
-def calculate_next_occurrence(rep_type, at_time, caller):
+def calculate_rep_vals(rep_type):
+    pass
+
+def calculate_next_occurrence(caller):
+    rep_type = caller.ui.every_box.currentData()
+    at_time = caller.ui.at_timeedit.time()
     cur_date = QDate.currentDate()
     rep_vals = []
 
+
+    print(rep_type)
+
+    print(at_time)
+
     next_occurrence = 0
 
-    if rep_type == 'Few Days':
+    if rep_type == 'few_days':
 
         cur_datetime_stamp = QDateTime(cur_date, at_time).toSecsSinceEpoch()
 
@@ -53,11 +66,11 @@ def calculate_next_occurrence(rep_type, at_time, caller):
 
         next_occurrence = cur_datetime_stamp + 86400 * value
 
-    elif rep_type == 'Week':
+    elif rep_type == 'week':
         return 0
         pass#gonnado later
 
-    elif rep_type == 'Mounth':
+    elif rep_type == 'month':
         cur_mounth = QDate(cur_date.year(), cur_date.month(), 1)
         cur_mounth_stamp = QDateTime(cur_mounth, at_time).toSecsSinceEpoch()
 
@@ -65,21 +78,21 @@ def calculate_next_occurrence(rep_type, at_time, caller):
         rep_vals.append(value)
 
         next_occurrence = cur_mounth_stamp + 86400 * (value-1)
-    elif rep_type == 'Year':
+    elif rep_type == 'year':
         cur_year = QDate(cur_date.year(), 1, 1)
         cur_year_stamp = QDateTime(cur_year, at_time).toSecsSinceEpoch()
 
         day_value = int(caller.ui.day_edit.text())
-        mounth_value = data['mounth_number'][caller.ui.mounth_edit.currentText()]
+        mounth_value = caller.ui.mounth_edit.currentData()
 
         rep_vals.append(day_value)
-        rep_vals.append(caller.ui.mounth_edit.currentText())
+        rep_vals.append(caller.ui.mounth_edit.currentData())
 
         req_date = QDate(cur_date.year()+1, mounth_value, day_value)
 
         next_occurrence = cur_year_stamp + 86400 * cur_year.daysTo(req_date)
 
-    elif rep_type == 'Day':
+    elif rep_type == 'day':
         cur_datetime = QDateTime(cur_date, at_time).toSecsSinceEpoch()
         next_occurrence = cur_datetime + 86400
 
