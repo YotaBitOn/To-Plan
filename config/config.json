@@ -14,22 +14,24 @@
         "December": 12
     },
     "cur_theme": "dark",
-    "cur_lang": "ua",
-    "panel_pos": "North",
+    "cur_lang": "eng",
+    "panel_pos": "East",
     "theme": {
         "dark": {
             "main": "black",
             "section": "gray",
             "button": "light-gray",
             "field": "black",
-            "text": "white"
+            "text": "white",
+            "icons": "white"
         },
         "light": {
             "main": "white",
             "section": "pearl",
             "button": "sterling",
             "field": "white",
-            "text": "black"
+            "text": "black",
+            "icons": "black"
         }
     },
     "diff_col": {

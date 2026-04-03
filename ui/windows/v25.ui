@@ -47,7 +47,7 @@
        <enum>QTabWidget::TabShape::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <property name="documentMode">
        <bool>false</bool>
@@ -284,7 +284,7 @@ border-radius: 15px;</string>
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>-660</y>
+                 <y>0</y>
                  <width>580</width>
                  <height>1863</height>
                 </rect>
@@ -2329,7 +2329,7 @@ border-radius: 15px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1023</width>
+             <width>879</width>
              <height>1726</height>
             </rect>
            </property>
@@ -2601,76 +2601,22 @@ border-radius: 15px;</string>
             <item>
              <layout class="QVBoxLayout" name="settings_layout" stretch="3,1">
               <item>
-               <layout class="QGridLayout" name="settings_grid_layout">
+               <layout class="QGridLayout" name="settings_grid_layout" rowstretch="0,0,0,0,0">
                 <property name="leftMargin">
                  <number>100</number>
                 </property>
                 <property name="rightMargin">
                  <number>100</number>
                 </property>
-                <item row="2" column="0">
-                 <widget class="QLabel" name="panel_loc_label">
+                <item row="4" column="0">
+                 <widget class="QLabel" name="category_enable_label">
                   <property name="font">
                    <font>
                     <pointsize>20</pointsize>
                    </font>
                   </property>
                   <property name="text">
-                   <string>Tabs panel location:</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="lang_box">
-                  <property name="font">
-                   <font>
-                    <pointsize>20</pointsize>
-                   </font>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>English</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Українська</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Русский</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
-                <item row="3" column="0">
-                 <widget class="QLabel" name="anim_label">
-                  <property name="font">
-                   <font>
-                    <pointsize>20</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Animations</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="6" column="0">
-                 <widget class="QLabel" name="edges_enable_label">
-                  <property name="font">
-                   <font>
-                    <pointsize>20</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Rounded edges</string>
+                   <string>Category for tasks</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -2679,6 +2625,12 @@ border-radius: 15px;</string>
                 </item>
                 <item row="2" column="1">
                  <widget class="QComboBox" name="panel_loc_box">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="font">
                    <font>
                     <pointsize>20</pointsize>
@@ -2706,73 +2658,6 @@ border-radius: 15px;</string>
                   </item>
                  </widget>
                 </item>
-                <item row="5" column="0">
-                 <widget class="QLabel" name="category_enable_label">
-                  <property name="font">
-                   <font>
-                    <pointsize>20</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Category for tasks</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="lang_label">
-                  <property name="font">
-                   <font>
-                    <pointsize>20</pointsize>
-                   </font>
-                  </property>
-                  <property name="layoutDirection">
-                   <enum>Qt::LayoutDirection::LeftToRight</enum>
-                  </property>
-                  <property name="text">
-                   <string>Language: </string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="4" column="0">
-                 <widget class="QLabel" name="difficulty_enable_label">
-                  <property name="font">
-                   <font>
-                    <pointsize>20</pointsize>
-                   </font>
-                  </property>
-                  <property name="text">
-                   <string>Difficulty for tasks</string>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="theme_box">
-                  <property name="font">
-                   <font>
-                    <pointsize>20</pointsize>
-                   </font>
-                  </property>
-                  <item>
-                   <property name="text">
-                    <string>Dark</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Light</string>
-                   </property>
-                  </item>
-                 </widget>
-                </item>
                 <item row="0" column="0">
                  <widget class="QLabel" name="theme_label">
                   <property name="font">
@@ -2791,16 +2676,22 @@ border-radius: 15px;</string>
                   </property>
                  </widget>
                 </item>
-                <item row="3" column="1">
-                 <widget class="QWidget" name="anim_toggle" native="true">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="panel_loc_label">
                   <property name="font">
                    <font>
                     <pointsize>20</pointsize>
                    </font>
                   </property>
+                  <property name="text">
+                   <string>Tabs panel location:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                  </property>
                  </widget>
                 </item>
-                <item row="4" column="1">
+                <item row="3" column="1">
                  <widget class="QWidget" name="difficulty_toggle" native="true">
                   <property name="font">
                    <font>
@@ -2809,7 +2700,77 @@ border-radius: 15px;</string>
                   </property>
                  </widget>
                 </item>
-                <item row="5" column="1">
+                <item row="3" column="0">
+                 <widget class="QLabel" name="difficulty_enable_label">
+                  <property name="font">
+                   <font>
+                    <pointsize>20</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Difficulty for tasks</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QComboBox" name="theme_box">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>20</pointsize>
+                   </font>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>Dark</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Light</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QComboBox" name="lang_box">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>20</pointsize>
+                   </font>
+                  </property>
+                  <item>
+                   <property name="text">
+                    <string>English</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Українська</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>Русский</string>
+                   </property>
+                  </item>
+                 </widget>
+                </item>
+                <item row="4" column="1">
                  <widget class="QWidget" name="category_toggle" native="true">
                   <property name="font">
                    <font>
@@ -2818,12 +2779,21 @@ border-radius: 15px;</string>
                   </property>
                  </widget>
                 </item>
-                <item row="6" column="1">
-                 <widget class="QWidget" name="edges_toggle" native="true">
+                <item row="1" column="0">
+                 <widget class="QLabel" name="lang_label">
                   <property name="font">
                    <font>
                     <pointsize>20</pointsize>
                    </font>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LayoutDirection::LeftToRight</enum>
+                  </property>
+                  <property name="text">
+                   <string>Language: </string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -3037,8 +3007,8 @@ border-radius: 100px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>338</width>
-                 <height>298</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_27"/>
@@ -3313,8 +3283,8 @@ border-radius: 15px;
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>667</width>
-                  <height>196</height>
+                  <width>98</width>
+                  <height>28</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_2"/>

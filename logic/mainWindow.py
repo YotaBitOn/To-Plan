@@ -3,7 +3,7 @@ import json
 from traceback import print_tb
 
 from PySide6.QtCore import QDateTime, Qt
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QPixmap
 from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget
 from PySide6.QtUiTools import QUiLoader
 
@@ -566,6 +566,9 @@ class MWindowFuncs():
         field_color = data['palette'][data['theme'][data['cur_theme']]['field']]
         text_color = data['palette'][data['theme'][data['cur_theme']]['text']]
 
+        #icons
+        self.setIcons()
+
         #main
         self.ui.setStyleSheet(f'''background-color:{main_color};
                                 color:{text_color};''')
@@ -881,6 +884,10 @@ class MWindowFuncs():
         self.ui.theme_box.setCurrentIndex(self.ui.theme_box.findData(data['cur_theme']))
         self.ui.theme_box.blockSignals(False)
 
+        self.ui.panel_loc_box.blockSignals(True)
+        self.ui.panel_loc_box.setCurrentIndex(self.ui.panel_loc_box.findData(data['panel_pos']))
+        self.ui.panel_loc_box.blockSignals(False)
+
     def changePanelPos(self):
         data['panel_pos'] = self.ui.panel_loc_box.currentData()
 
@@ -902,7 +909,26 @@ class MWindowFuncs():
         if data['panel_pos'] == 'South':
             self.ui.tabWidget.setTabPosition(QTabWidget.South)
 
+    def setIcons(self):
+        cur_icons = data['theme'][data['cur_theme']]['icons']
 
+        icons_map = {
+            self.ui.tasks_prev_button: 'chevron-left',
+            self.ui.tasks_next_button: 'chevron-right',
+            self.ui.add_task_button: 'plus',
+            self.ui.task_complete_button: 'circle',
+            self.ui.add_task_step_button: 'plus',
+            self.ui.edit_repeatable_button: 'pencil',
+            self.ui.cur_streak_icon: 'flame',
+            self.ui.best_streak_icon: 'flame',
+            self.ui.delete_task: 'trash',
+        }
+
+        for widget, icon_name in icons_map.items():
+            widget.setIcon(QIcon(f'sources/icons_{cur_icons}/{icon_name}.svg'))
+
+        # QLabel uses setPixmap instead of setIcon
+        self.ui.acc_icon.setPixmap(QPixmap(f'sources/icons_{cur_icons}/user-round.svg'))
 
 
 mw = MainWindow()
