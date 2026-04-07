@@ -1,6 +1,7 @@
 import csv
 import datetime
 import json
+import webbrowser
 from traceback import print_tb
 
 from PySide6.QtCore import QDateTime, Qt
@@ -82,7 +83,8 @@ class MainWindow(QMainWindow):
         self.ui.panel_loc_box.currentTextChanged.connect(lambda x: self.funcs.changePanelPos())
 
         self.ui.export_data_button.clicked.connect(lambda x: self.funcs.exportData())
-
+        #webbrowser.open("https://github.com/YotaBitOn")
+        self.ui.git_button.clicked.connect(lambda x: webbrowser.open("https://github.com/YotaBitOn"))
     def loadTasks(self):
         ### task widget setting
         cur_date = datetime_str(state.cur_date)
@@ -716,7 +718,7 @@ class MWindowFuncs():
             self.ui.difficulty_enable_label: "settings.show_difficulty",
             self.ui.category_enable_label: "settings.show_category",
             self.ui.export_data_button: "settings.export_data",
-            self.ui.contact_dev_button: "settings.contact_dev",
+            self.ui.contact_dev_label: "settings.contact_dev",
             self.ui.login_button: "settings.login",
 
             # User
@@ -926,6 +928,8 @@ class MWindowFuncs():
             self.ui.cur_streak_icon: 'flame',
             self.ui.best_streak_icon: 'flame',
             self.ui.delete_task: 'trash',
+            #self.ui.telegram_button: 'telegram',
+            self.ui.git_button: 'github'
         }
 
         for widget, icon_name in icons_map.items():
