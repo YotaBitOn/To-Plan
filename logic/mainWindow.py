@@ -1,10 +1,11 @@
+import csv
 import datetime
 import json
 from traceback import print_tb
 
 from PySide6.QtCore import QDateTime, Qt
 from PySide6.QtGui import QIcon, QPixmap
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget, QFileDialog
 from PySide6.QtUiTools import QUiLoader
 
 #variables
@@ -36,6 +37,8 @@ class MainWindow(QMainWindow):
     def setUI(self):
         self.ui.task_step_progress.setVisible(False)
         self.ui.task_info_stack.setVisible(False)
+
+        self.ui.tabWidget.setCurrentIndex(0)
 
         self.ui.theme_box.setCurrentText(data['cur_theme']) #!
 
@@ -76,8 +79,9 @@ class MainWindow(QMainWindow):
         #settings related
         self.ui.theme_box.currentTextChanged.connect(lambda x: self.funcs.changeTheme())
         self.ui.lang_box.currentTextChanged.connect(lambda x: self.funcs.changeLang())
-
         self.ui.panel_loc_box.currentTextChanged.connect(lambda x: self.funcs.changePanelPos())
+
+        self.ui.export_data_button.clicked.connect(lambda x: self.funcs.exportData())
 
     def loadTasks(self):
         ### task widget setting
@@ -929,6 +933,30 @@ class MWindowFuncs():
 
         # QLabel uses setPixmap instead of setIcon
         self.ui.acc_icon.setPixmap(QPixmap(f'sources/icons_{cur_icons}/user-round.svg'))
+
+    def exportData(self):
+        file_path, _ = QFileDialog.getSaveFileName(
+            self.ui,
+            "Зберегти CSV",
+            "",
+            "CSV Files (*.csv)"
+        )
+
+        if not file_path:
+            return
+
+        cursor.execute("SELECT * FROM users")
+        rows = cursor.fetchall()
+
+        column_names = [description[0] for description in cursor.description]
+
+        with open(file_path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+
+            writer.writerow(column_names)
+            writer.writerows(rows)
+
+        print("Експорт завершено:", file_path)
 
 
 mw = MainWindow()
