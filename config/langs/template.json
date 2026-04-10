@@ -1,5 +1,6 @@
 {
     "difficulty.label": "",
+    "difficulty.very_easy": "",
     "difficulty.easy": "",
     "difficulty.medium": "",
     "difficulty.hard": "",
@@ -35,6 +36,14 @@
     "repeat.on_day": "",
     "repeat.how_many_days": "",
     "repeat.on": "",
+
+    "week.mon" :  "",
+    "week.tue" :  "",
+    "week.wed" :  "",
+    "week.thu" :  "",
+    "week.fri" :  "",
+    "week.sat" :  "",
+    "week.sun" :  "",
 
     "month.january": "",
     "month.february": "",
@@ -78,5 +87,11 @@
     "nav.analytics": "",
     "nav.settings": "",
     "nav.user": "",
-    "nav.clock": ""
+    "nav.clock": "",
+
+    "task.name": "",
+    "task.at": "",
+    "task.due": "",
+
+    "popup.done": ""
 }

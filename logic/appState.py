@@ -12,6 +12,7 @@ class AppState:
         self.dates = []
 
     def print_tasks(self):
+        return
         for key in self.tasks:
             print(key)
             for sub_key in self.tasks[key]:

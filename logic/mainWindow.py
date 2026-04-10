@@ -119,105 +119,117 @@ class MainWindow(QMainWindow):
 
         if data:
             for task in data:
-                name = task[0]
-                date = task[1]
-                startTime = task[2]
-                endTime = task[3]
-                difficulty = task[4]
-                category = task[5]
-                completed = task[6]
-                is_repeatable = task[7]
-                rep_option = task[8]
-                rep_vals = task[9].split(' ')
-                taskSteps = task[10]
-                description = task[11]
-                taskId = task[12]
+                try:
+                    name = task[0]
+                    date = task[1]
+                    startTime = task[2]
+                    endTime = task[3]
+                    difficulty = task[4]
+                    category = task[5]
+                    completed = task[6]
+                    is_repeatable = task[7]
+                    rep_option = task[8]
+                    rep_vals = task[9].split(' ')
+                    taskSteps = task[10]
+                    description = task[11]
+                    taskId = task[12]
 
-                state.cur_task = taskId
+                    state.cur_task = taskId
 
 
-                state.tasks[taskId] = {
-                    'taskName': name,
-                    'taskNo' : state.task_ammo,
-                    'taskWidget': None,
-                    'difficulty': difficulty,
-                    'category': category,
-                    'description': description,
-                    'completed': completed,
-                    'duration': [startTime, endTime],
-                    'taskDate': {
-                        'date': date,
-                        'page': None
-                    },
-                    'taskSteps': {
-                        'steps': {},
-                        'page': None
-                    },
-                    'repeatable': {
-                        'is_repeatable': is_repeatable,
-                        'next_occurrence': None,  # calculate_next_occur
-                        'rep_option': rep_option,
-                        'rep_vals': rep_vals
+                    state.tasks[taskId] = {
+                        'taskName': name,
+                        'taskNo' : state.task_ammo,
+                        'taskWidget': None,
+                        'difficulty': difficulty,
+                        'category': category,
+                        'description': description,
+                        'completed': completed,
+                        'duration': [startTime, endTime],
+                        'taskDate': {
+                            'date': date,
+                            'page': None
+                        },
+                        'taskSteps': {
+                            'steps': {},
+                            'page': None
+                        },
+                        'repeatable': {
+                            'is_repeatable': is_repeatable,
+                            'next_occurrence': None,  # calculate_next_occur
+                            'rep_option': rep_option,
+                            'rep_vals': rep_vals
+                        }
                     }
-                }
-                task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,
-                                   parent=None)  # change it
-                state.tasks[taskId]['taskWidget'] = task_widget
+                    task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,
+                                       parent=None)  # change it
+                    state.tasks[taskId]['taskWidget'] = task_widget
 
-                if len(taskSteps) > 0 or True: #change it
-                    task_step_page = QWidget()
-                    task_step_page_layout = QVBoxLayout(task_step_page)
-                    state.tasks[taskId]['taskSteps']['page'] = task_step_page
+                    if len(taskSteps) > 0 or True: #change it
+                        task_step_page = QWidget()
+                        task_step_page_layout = QVBoxLayout(task_step_page)
+                        state.tasks[taskId]['taskSteps']['page'] = task_step_page
 
-                    self.ui.steps_stack.addWidget(task_step_page)
-                    self.ui.task_step_progress.setVisible(True)
-
-
-                    for step in taskSteps.split('@@')[:-1]:
-
-                        step_name, step_completed = step[:-1], int(step[-1])
-                        state.tasks[taskId]['taskSteps']['steps'][step_name] = step_completed
-
-                        # mw.steps_stack.setVisible(True)
-
-                        #task_page = state.tasks[state.cur_task]['taskSteps']['page']
-                        task_page_layout = task_step_page.layout()
-                        task_step = TaskStep(step_name, parent=task_step_page)
-                        task_page_layout.addWidget(task_step.taskstep)
-
-                        state.tasks[state.cur_task]['taskSteps']['steps'][step_name] = step_completed
-
-                        self.funcs.update_progress_bar()
-
-                        self.ui.steps_stack.setMaximumHeight(
-                            self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
-                        self.ui.steps_stack.updateGeometry()
-
-                if is_repeatable:
-                    next_occurrence = calculate_next_occurrence_raw(
-                        rep_option,
-                        rep_vals,
-                        startTime)
+                        self.ui.steps_stack.addWidget(task_step_page)
+                        self.ui.task_step_progress.setVisible(True)
 
 
-                    state.tasks[taskId]['repeatable']['next_occurrence'] = next_occurrence
+                        for step in taskSteps.split('@@')[:-1]:
 
-                    next_occurrence_date = datetime.datetime.fromtimestamp(next_occurrence).strftime("%d.%m.%Y")
-                    next_occurrence_time = datetime.datetime.fromtimestamp(next_occurrence).strftime("%H:%M")
+                            step_name, step_completed = step[:-1], int(step[-1])
+                            state.tasks[taskId]['taskSteps']['steps'][step_name] = step_completed
 
-                    self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
-                    #!
-                    self.ui.every_box.setCurrentIndex(state.tasks[state.cur_task]['repeatable']['rep_option'])
-                    self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals'])
+                            # mw.steps_stack.setVisible(True)
+
+                            #task_page = state.tasks[state.cur_task]['taskSteps']['page']
+                            task_page_layout = task_step_page.layout()
+                            task_step = TaskStep(step_name, parent=task_step_page)
+                            task_page_layout.addWidget(task_step.taskstep)
+
+                            state.tasks[state.cur_task]['taskSteps']['steps'][step_name] = step_completed
+
+                            self.funcs.update_progress_bar()
+
+                            self.ui.steps_stack.setMaximumHeight(
+                                self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
+                            self.ui.steps_stack.updateGeometry()
+
+                    if is_repeatable:
+                        next_occurrence = calculate_next_occurrence_raw(
+                            rep_option,
+                            rep_vals,
+                            startTime)
 
 
-                state.tasks[taskId]['taskDate']['page'] = date_page
-                date_page.layout().addWidget(state.tasks[taskId]['taskWidget'].task)
+                        state.tasks[taskId]['repeatable']['next_occurrence'] = next_occurrence
 
-                state.task_ammo += 1
+                        next_occurrence_date = datetime.datetime.fromtimestamp(next_occurrence).strftime("%d.%m.%Y")
+                        next_occurrence_time = datetime.datetime.fromtimestamp(next_occurrence).strftime("%H:%M")
 
-                self.funcs.check_completion()
-                state.print_tasks()
+                        self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+                        #!
+                        self.ui.every_box.setCurrentIndex(state.tasks[state.cur_task]['repeatable']['rep_option'])
+                        self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals'])
+
+
+                    state.tasks[taskId]['taskDate']['page'] = date_page
+                    date_page.layout().addWidget(state.tasks[taskId]['taskWidget'].task)
+
+                    state.task_ammo += 1
+
+                    self.funcs.check_completion()
+                    state.print_tasks()
+                except:
+                    delete_task = input(f'Task #{task[12]} is corrupted, delete it?(y/n)')
+                    if delete_task.lower() == 'y':
+                        cursor.execute('''
+                        DELETE FROM users WHERE id=?''', (task[12],))
+
+                        conn.commit()
+
+                        print(f'Task #{task[12]} was deleted')
+                    else:
+                        print(f'Task #{task[12]} was skipped')
 
 class MWindowFuncs():
     def __init__(self, ui):
@@ -680,7 +692,7 @@ class MWindowFuncs():
             json.dump(data, f, indent=4)
 
         self.setLang()
-
+        signals.change_lang.emit()
     def setLang(self):
 
         cur_lang = data['cur_lang']
@@ -960,7 +972,7 @@ class MWindowFuncs():
             writer.writerow(column_names)
             writer.writerows(rows)
 
-        print("Експорт завершено:", file_path)
+
 
 
 mw = MainWindow()

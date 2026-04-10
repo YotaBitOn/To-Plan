@@ -1,5 +1,6 @@
 {
     "difficulty.label": "Difficulty",
+    "difficulty.very_easy": "Very easy",
     "difficulty.easy": "Easy",
     "difficulty.medium": "Medium",
     "difficulty.hard": "Hard",
@@ -35,6 +36,14 @@
     "repeat.on_day": "On day",
     "repeat.how_many_days": "How many days",
     "repeat.on": "On",
+
+    "week.mon" :  "Mon",
+    "week.tue" :  "Tue",
+    "week.wed" :  "Wed",
+    "week.thu" :  "Thu",
+    "week.fri" :  "Fri",
+    "week.sat" :  "Sat",
+    "week.sun" :  "Sun",
 
     "month.january": "January",
     "month.february": "February",
@@ -78,5 +87,11 @@
     "nav.analytics": "Analytics",
     "nav.settings": "Settings",
     "nav.user": "User",
-    "nav.clock": "Clock"
+    "nav.clock": "Clock",
+
+    "task.name": "Name",
+    "task.at": "At",
+    "task.due": "Due",
+
+    "popup.done": "Done"
 }

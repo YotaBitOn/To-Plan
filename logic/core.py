@@ -51,9 +51,9 @@ def calculate_next_occurrence(caller):
     rep_vals = []
 
 
-    print(rep_type)
 
-    print(at_time)
+
+
 
     next_occurrence = 0
 

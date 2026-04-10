@@ -1,5 +1,6 @@
 {
     "difficulty.label": "Складність",
+    "difficulty.very_easy": "Дуже легка",
     "difficulty.easy": "Легка",
     "difficulty.medium": "Середня",
     "difficulty.hard": "Важка",
@@ -35,6 +36,14 @@
     "repeat.on_day": "У день",
     "repeat.how_many_days": "Скільки днів",
     "repeat.on": "У",
+
+    "week.mon" :  "Пн",
+    "week.tue" :  "Вт",
+    "week.wed" :  "Ср",
+    "week.thu" :  "Чт",
+    "week.fri" :  "Пт",
+    "week.sat" :  "Сб",
+    "week.sun" :  "Нд",
 
     "month.january": "Січень",
     "month.february": "Лютий",
@@ -78,5 +87,11 @@
     "nav.analytics": "Аналітика",
     "nav.settings": "Налаштування",
     "nav.user": "Користувач",
-    "nav.clock": "Годинник"
+    "nav.clock": "Годинник",
+
+    "task.name": "Назва",
+    "task.at": "О",
+    "task.due": "До",
+
+    "popup.done": "Готово"
 }

@@ -35,10 +35,10 @@
         }
     },
     "diff_col": {
-        "Easy": "green",
-        "Medium": "yellow",
-        "Hard": "red",
-        "Free": "blue"
+        "easy": "green",
+        "medium": "yellow",
+        "hard": "red",
+        "very_easy": "blue"
     },
     "palette": {
         "red": "rgb(211, 0, 0)",
@@ -54,10 +54,12 @@
         "black": "rgb(16, 16, 16)"
     },
     "icons": {
-        "Chores": "brush-cleaning(3).svg",
-        "Sport": "dumbbell.svg",
-        "Education": "graduation-cap.svg",
-        "Job": "hand-coins.svg",
-        "Meal": "utensils-crossed.svg"
+        "chores": "brush-cleaning(3).svg",
+        "finance": "circle-dollar-sign.svg",
+        "sport": "dumbbell.svg",
+        "food": "utensils.svg",
+        "meal": "utensils-crossed.svg",
+        "education": "graduation-cap.svg",
+        "job": "hand-coins.svg"
     }
 }

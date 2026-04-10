@@ -10,6 +10,7 @@ class AppSignals(QObject):
     setEmptyPage = Signal(str)
 
     change_theme = Signal()
+    change_lang = Signal()
     def __init__(self):
         super().__init__()
 
