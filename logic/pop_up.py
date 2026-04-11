@@ -174,7 +174,6 @@ class Popup():
         with open(f"config/config.json", "r") as f:
             data = json.load(f)
         cur_lang = data['cur_lang']
-        print('67 ',data)
         with open(f"config/langs/{cur_lang}.json", "r") as f:
             lang = json.load(f)
 

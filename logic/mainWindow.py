@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
 
         self.setUI()
         self.setCustomWidgets()
-        self.loadTasks()
+        self.funcs.loadTasks()
         self.linkFuncs()
         #self.ui.show())
 
@@ -59,178 +59,33 @@ class MainWindow(QMainWindow):
         signals.update_progress_bar.connect(lambda: self.funcs.update_progress_bar())
         signals.setEmptyPage.connect(lambda name: self.funcs.setEmptyPage(name=name))
         #popup related
-        self.ui.add_task_button.clicked.connect(lambda x: signals.show_add_task_popup.emit())
+        self.ui.add_task_button.clicked.connect(lambda : signals.show_add_task_popup.emit())
 
         #taskstep related
-        self.ui.add_task_step_button.clicked.connect(lambda x: self.funcs.add_task_step())
+        self.ui.add_task_step_button.clicked.connect(lambda : self.funcs.add_task_step())
 
         #task related
-        self.ui.delete_task.clicked.connect(lambda x: state.tasks[state.cur_task]['taskWidget'].deconstruct())
+        self.ui.delete_task.clicked.connect(lambda : state.tasks[state.cur_task]['taskWidget'].deconstruct())
         #!
-        self.ui.every_box.currentTextChanged.connect(lambda x: self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals']) )
-        self.ui.repeatable_toggle.toggled.connect(lambda x: self.funcs.toggle_mw_repeatable_menu())
-        self.ui.task_complete_button.clicked.connect(lambda x: self.funcs.complete_task(state.cur_task))
+        self.ui.every_box.currentTextChanged.connect(lambda : self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals']) )
+        self.ui.repeatable_toggle.toggled.connect(lambda : self.funcs.toggle_mw_repeatable_menu())
+        self.ui.task_complete_button.clicked.connect(lambda : self.funcs.complete_task(state.cur_task))
         self.ui.edit_repeatable_button.mode = 'edit'
-        self.ui.edit_repeatable_button.clicked.connect(lambda x: self.funcs.edit_repeatable())
-        self.ui.at_timeedit.timeChanged.connect(lambda x: self.funcs.edit_starttime())
-        self.ui.due_timeedit.timeChanged.connect(lambda x: self.funcs.edit_endtime())
-        self.ui.tasks_prev_button.clicked.connect(lambda x: self.funcs.change_date(-1))
-        self.ui.tasks_next_button.clicked.connect(lambda x: self.funcs.change_date(1))
+        self.ui.edit_repeatable_button.clicked.connect(lambda : self.funcs.edit_repeatable())
+        self.ui.at_timeedit.timeChanged.connect(lambda : self.funcs.edit_starttime())
+        self.ui.due_timeedit.timeChanged.connect(lambda : self.funcs.edit_endtime())
+        self.ui.tasks_prev_button.clicked.connect(lambda : self.funcs.change_date(-1))
+        self.ui.tasks_next_button.clicked.connect(lambda : self.funcs.change_date(1))
 
         #settings related
-        self.ui.theme_box.currentTextChanged.connect(lambda x: self.funcs.changeTheme())
-        self.ui.lang_box.currentTextChanged.connect(lambda x: self.funcs.changeLang())
-        self.ui.panel_loc_box.currentTextChanged.connect(lambda x: self.funcs.changePanelPos())
+        self.ui.theme_box.currentTextChanged.connect(lambda : self.funcs.changeTheme())
+        self.ui.lang_box.currentTextChanged.connect(lambda : self.funcs.changeLang())
+        self.ui.panel_loc_box.currentTextChanged.connect(lambda : self.funcs.changePanelPos())
 
-        self.ui.export_data_button.clicked.connect(lambda x: self.funcs.exportData())
+        self.ui.export_data_button.clicked.connect(lambda : self.funcs.exportData())
         #webbrowser.open("https://github.com/YotaBitOn")
-        self.ui.git_button.clicked.connect(lambda x: webbrowser.open("https://github.com/YotaBitOn"))
+        self.ui.git_button.clicked.connect(lambda : webbrowser.open("https://github.com/YotaBitOn"))
 
-    def loadTasks(self):
-        ### task widget setting
-        cur_date = datetime_str(state.cur_date)
-
-        cursor.execute('''
-                SELECT 
-                    taskName,                   
-                    date,                   
-                    at_time,                    
-                    due_time,                   
-                    difficulty,                 
-                    category,                   
-                    completed,                  
-                    repeatable,                 
-                    rep_option,                 
-                    rep_vals,                   
-                    task_steps_infos,
-                    description,
-                    id              
-                FROM users WHERE user=? AND date=?''' , (user,cur_date))
-
-        data = cursor.fetchall()
-
-        date_page = QWidget()
-        date_page.setObjectName(cur_date)
-        date_page_layout = QVBoxLayout(date_page)
-        self.ui.task_list_stack.addWidget(date_page)
-        self.ui.task_list_stack.setCurrentWidget(date_page)
-        state.dates.append(cur_date)
-        #
-
-
-        if data:
-            for task in data:
-                try:
-                    name = task[0]
-                    date = task[1]
-                    startTime = task[2]
-                    endTime = task[3]
-                    difficulty = task[4]
-                    category = task[5]
-                    completed = task[6]
-                    is_repeatable = task[7]
-                    rep_option = task[8]
-                    rep_vals = task[9].split(' ')
-                    taskSteps = task[10]
-                    description = task[11]
-                    taskId = task[12]
-
-                    state.cur_task = taskId
-
-
-                    state.tasks[taskId] = {
-                        'taskName': name,
-                        'taskNo' : state.task_ammo,
-                        'taskWidget': None,
-                        'difficulty': difficulty,
-                        'category': category,
-                        'description': description,
-                        'completed': completed,
-                        'duration': [startTime, endTime],
-                        'taskDate': {
-                            'date': date,
-                            'page': None
-                        },
-                        'taskSteps': {
-                            'steps': {},
-                            'page': None
-                        },
-                        'repeatable': {
-                            'is_repeatable': is_repeatable,
-                            'next_occurrence': None,  # calculate_next_occur
-                            'rep_option': rep_option,
-                            'rep_vals': rep_vals
-                        }
-                    }
-                    task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,
-                                       parent=None)  # change it
-                    state.tasks[taskId]['taskWidget'] = task_widget
-
-                    if len(taskSteps) > 0 or True: #change it
-                        task_step_page = QWidget()
-                        task_step_page_layout = QVBoxLayout(task_step_page)
-                        state.tasks[taskId]['taskSteps']['page'] = task_step_page
-
-                        self.ui.steps_stack.addWidget(task_step_page)
-                        self.ui.task_step_progress.setVisible(True)
-
-
-                        for step in taskSteps.split('@@')[:-1]:
-
-                            step_name, step_completed = step[:-1], int(step[-1])
-                            state.tasks[taskId]['taskSteps']['steps'][step_name] = step_completed
-
-                            # mw.steps_stack.setVisible(True)
-
-                            #task_page = state.tasks[state.cur_task]['taskSteps']['page']
-                            task_page_layout = task_step_page.layout()
-                            task_step = TaskStep(step_name, parent=task_step_page)
-                            task_page_layout.addWidget(task_step.taskstep)
-
-                            state.tasks[state.cur_task]['taskSteps']['steps'][step_name] = step_completed
-
-                            self.funcs.update_progress_bar()
-
-                            self.ui.steps_stack.setMaximumHeight(
-                                self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
-                            self.ui.steps_stack.updateGeometry()
-
-                    if is_repeatable:
-                        next_occurrence = calculate_next_occurrence_raw(
-                            rep_option,
-                            rep_vals,
-                            startTime)
-
-
-                        state.tasks[taskId]['repeatable']['next_occurrence'] = next_occurrence
-
-                        next_occurrence_date = datetime.datetime.fromtimestamp(next_occurrence).strftime("%d.%m.%Y")
-                        next_occurrence_time = datetime.datetime.fromtimestamp(next_occurrence).strftime("%H:%M")
-
-                        self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
-                        #!
-                        self.ui.every_box.setCurrentIndex(state.tasks[state.cur_task]['repeatable']['rep_option'])
-                        self.funcs.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals'])
-
-
-                    state.tasks[taskId]['taskDate']['page'] = date_page
-                    date_page.layout().addWidget(state.tasks[taskId]['taskWidget'].task)
-
-                    state.task_ammo += 1
-
-                    self.funcs.check_completion()
-                    state.print_tasks()
-                except:
-                    delete_task = input(f'Task #{task[12]} is corrupted, delete it?(y/n)')
-                    if delete_task.lower() == 'y':
-                        cursor.execute('''
-                        DELETE FROM users WHERE id=?''', (task[12],))
-
-                        conn.commit()
-
-                        print(f'Task #{task[12]} was deleted')
-                    else:
-                        print(f'Task #{task[12]} was skipped')
 
 class MWindowFuncs():
     def __init__(self, ui):
@@ -552,20 +407,26 @@ class MWindowFuncs():
         state.cur_date = new_date
 
         new_date_str = datetime_str(new_date)
+
+        print(state.dates)
+        print(new_date_str, end=' ')
         if new_date_str not in state.dates:
+            print('is not in dates')
 
-            date_page = QWidget()
-            date_page.setObjectName(new_date_str)
-            date_page_layout = QVBoxLayout(date_page)
+            #date_page = QWidget()
+            #date_page.setObjectName(new_date_str)
+            #date_page_layout = QVBoxLayout(date_page)
+            #self.ui.task_list_stack.addWidget(date_page)
 
-            self.ui.task_list_stack.addWidget(date_page)
+            self.loadTasks()
             state.dates.append(new_date_str)
 
         else:
+            print('req is in dates')
             date_page = self.ui.task_list_stack.findChild(QWidget, new_date_str)
-
+            self.ui.task_list_stack.setCurrentWidget(date_page)
         self.ui.tasks_date_label.setText(new_date_str)
-        self.ui.task_list_stack.setCurrentWidget(date_page)
+
 
     def changeTheme(self):
         data['cur_theme'] = self.ui.theme_box.currentData()
@@ -694,6 +555,7 @@ class MWindowFuncs():
 
         self.setLang()
         signals.change_lang.emit()
+
     def setLang(self):
 
         cur_lang = data['cur_lang']
@@ -973,7 +835,154 @@ class MWindowFuncs():
             writer.writerow(column_names)
             writer.writerows(rows)
 
+    def loadTasks(self):
+        ### task widget setting
+        print('Loading tasks for ', datetime_str(state.cur_date))
 
+        cur_date = datetime_str(state.cur_date)
+
+        cursor.execute('''
+                SELECT 
+                    taskName,                   
+                    date,                   
+                    at_time,                    
+                    due_time,                   
+                    difficulty,                 
+                    category,                   
+                    completed,                  
+                    repeatable,                 
+                    rep_option,                 
+                    rep_vals,                   
+                    task_steps_infos,
+                    description,
+                    id              
+                FROM users WHERE user=? AND date=?''' , (user,cur_date))
+
+        data = cursor.fetchall()
+
+        date_page = QWidget()
+        date_page.setObjectName(cur_date)
+        date_page_layout = QVBoxLayout(date_page)
+        self.ui.task_list_stack.addWidget(date_page)
+        self.ui.task_list_stack.setCurrentWidget(date_page)
+        state.dates.append(cur_date)
+        #
+
+
+        if data:
+            for task in data:
+                try:
+                    name = task[0]
+                    date = task[1]
+                    startTime = task[2]
+                    endTime = task[3]
+                    difficulty = task[4]
+                    category = task[5]
+                    completed = task[6]
+                    is_repeatable = task[7]
+                    rep_option = task[8]
+                    rep_vals = task[9].split(' ')
+                    taskSteps = task[10]
+                    description = task[11]
+                    taskId = task[12]
+
+                    state.cur_task = taskId
+
+
+                    state.tasks[taskId] = {
+                        'taskName': name,
+                        'taskNo' : state.task_ammo,
+                        'taskWidget': None,
+                        'difficulty': difficulty,
+                        'category': category,
+                        'description': description,
+                        'completed': completed,
+                        'duration': [startTime, endTime],
+                        'taskDate': {
+                            'date': date,
+                            'page': None
+                        },
+                        'taskSteps': {
+                            'steps': {},
+                            'page': None
+                        },
+                        'repeatable': {
+                            'is_repeatable': is_repeatable,
+                            'next_occurrence': None,  # calculate_next_occur
+                            'rep_option': rep_option,
+                            'rep_vals': rep_vals
+                        }
+                    }
+                    task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,
+                                       parent=None)  # change it
+                    state.tasks[taskId]['taskWidget'] = task_widget
+
+                    if len(taskSteps) > 0 or True: #change it
+                        task_step_page = QWidget()
+                        task_step_page_layout = QVBoxLayout(task_step_page)
+                        state.tasks[taskId]['taskSteps']['page'] = task_step_page
+
+                        self.ui.steps_stack.addWidget(task_step_page)
+                        self.ui.task_step_progress.setVisible(True)
+
+
+                        for step in taskSteps.split('@@')[:-1]:
+
+                            step_name, step_completed = step[:-1], int(step[-1])
+                            state.tasks[taskId]['taskSteps']['steps'][step_name] = step_completed
+
+                            # mw.steps_stack.setVisible(True)
+
+                            #task_page = state.tasks[state.cur_task]['taskSteps']['page']
+                            task_page_layout = task_step_page.layout()
+                            task_step = TaskStep(step_name, parent=task_step_page)
+                            task_page_layout.addWidget(task_step.taskstep)
+
+                            state.tasks[state.cur_task]['taskSteps']['steps'][step_name] = step_completed
+
+                            self.update_progress_bar()
+
+                            self.ui.steps_stack.setMaximumHeight(
+                                self.ui.steps_stack.currentWidget().layout().sizeHint().height() + 90)
+                            self.ui.steps_stack.updateGeometry()
+
+                    if is_repeatable:
+                        next_occurrence = calculate_next_occurrence_raw(
+                            rep_option,
+                            rep_vals,
+                            startTime)
+
+
+                        state.tasks[taskId]['repeatable']['next_occurrence'] = next_occurrence
+
+                        next_occurrence_date = datetime.datetime.fromtimestamp(next_occurrence).strftime("%d.%m.%Y")
+                        next_occurrence_time = datetime.datetime.fromtimestamp(next_occurrence).strftime("%H:%M")
+
+                        self.ui.next_time_label.setText(f'Next time you will recieve this task on {next_occurrence_date} at {next_occurrence_time}')
+                        #!
+                        self.ui.every_box.setCurrentIndex(state.tasks[state.cur_task]['repeatable']['rep_option'])
+                        self.set_mw_every_stack(state.tasks[state.cur_task]['repeatable']['rep_vals'])
+
+
+                    state.tasks[taskId]['taskDate']['page'] = date_page
+                    date_page.layout().addWidget(state.tasks[taskId]['taskWidget'].task)
+
+                    state.task_ammo += 1
+
+                    self.check_completion()
+                    state.print_tasks()
+                except Exception as e:
+                    print(f'Problem for task #{task[12]} occured: \n', e)
+                    delete_task = input(f'Task #{task[12]} is corrupted, delete it?(y/n)')
+                    if delete_task.lower() == 'y':
+                        cursor.execute('''
+                        DELETE FROM users WHERE id=?''', (task[12],))
+
+                        conn.commit()
+
+                        print(f'Task #{task[12]} was deleted')
+                    else:
+                        print(f'Task #{task[12]} was skipped')
 
 
 mw = MainWindow()
