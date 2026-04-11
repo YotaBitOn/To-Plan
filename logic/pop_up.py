@@ -22,8 +22,10 @@ class Popup():
         self.ui = QUiLoader().load(popup_ui, None)
 
         signals.change_lang.connect(lambda : self.setLang())
+        signals.change_theme.connect(lambda: self.setTheme())
 
         self.setUI()
+
     def setUI(self):
 
         self.ui.repeatable_toggle = AnimatedToggle(self.ui)
@@ -35,6 +37,7 @@ class Popup():
         self.ui.every_box.currentTextChanged.connect(self.set_popup_every_stack)
 
         self.setLang()
+        self.setTheme()
         #signals.show_add_task_self.ui.connect(lambda :self.show_add_task_popup())
         #self.show_add_task_popup()
 
@@ -261,5 +264,32 @@ class Popup():
             for item, data in combos_map[combo].items():
                 combo.addItem(item, data)
             combo.blockSignals(False)
+
+    def setTheme(self):
+        with open(f"config/config.json", "r") as f:
+            data = json.load(f)
+
+        cur_theme = data['cur_theme']
+
+        main_color = data['palette'][data['theme'][cur_theme]['main']]
+        button_color = data['palette'][data['theme'][cur_theme]['button']]
+        field_color = data['palette'][data['theme'][cur_theme]['field']]
+        text_color = data['palette'][data['theme'][cur_theme]['text']]
+
+        self.ui.setStyleSheet(f'''
+            QWidget {{
+                background-color: {main_color};
+                color: {text_color};
+            }}
+
+            QLineEdit, QTextEdit, QComboBox, QTimeEdit {{
+                background-color: {field_color};
+            }}
+
+            QPushButton {{
+                background-color: {button_color};
+            }}
+        ''')
+
 popup = Popup()
 signals.show_add_task_popup.connect(lambda: popup.show_add_task_popup())

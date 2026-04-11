@@ -85,6 +85,7 @@ class MainWindow(QMainWindow):
         self.ui.export_data_button.clicked.connect(lambda x: self.funcs.exportData())
         #webbrowser.open("https://github.com/YotaBitOn")
         self.ui.git_button.clicked.connect(lambda x: webbrowser.open("https://github.com/YotaBitOn"))
+
     def loadTasks(self):
         ### task widget setting
         cur_date = datetime_str(state.cur_date)

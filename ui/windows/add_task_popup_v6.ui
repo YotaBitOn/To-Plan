@@ -32,8 +32,31 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">
-background-color: rgb(40,40,40);</string>
+   <string notr="true">*  {
+background-color: rgb(3, 255, 62);;
+color: rgb(255, 0, 0);
+}
+
+QLineEdit {
+	background-color: rgb(0, 81, 255);
+}
+
+QTextEdit {
+	background-color: rgb(255, 141, 10);
+}
+
+QComboBox {
+	background-color: rgb(255, 64, 245);
+}
+
+QTimeEdit{
+	background-color: rgb(161, 0, 255);
+}
+
+QPushButton{
+	background-color: rgb(42, 71, 74);
+}
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1,0,1,1,1,1,0,1,1,1">
    <property name="leftMargin">
@@ -82,7 +105,7 @@ background-color: rgb(40,40,40);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(16, 16, 16);</string>
+        <string notr="true"/>
        </property>
       </widget>
      </item>
@@ -128,7 +151,7 @@ background-color: rgb(40,40,40);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(16, 16, 16);</string>
+        <string notr="true"/>
        </property>
       </widget>
      </item>
@@ -181,7 +204,7 @@ background-color: rgb(40,40,40);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(16, 16, 16);</string>
+        <string notr="true"/>
        </property>
       </widget>
      </item>
@@ -221,7 +244,7 @@ background-color: rgb(40,40,40);</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(16, 16, 16);</string>
+        <string notr="true"/>
        </property>
       </widget>
      </item>
@@ -339,7 +362,7 @@ background-color: rgb(40,40,40);</string>
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgb(16, 16, 16);</string>
+           <string notr="true"/>
           </property>
           <item>
            <property name="text">
@@ -403,7 +426,7 @@ border-radius: 25px;
 }</string>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="day">
          <property name="minimumSize">
@@ -454,7 +477,7 @@ border-radius: 25px;
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(16, 16, 16);</string>
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -660,7 +683,7 @@ border-radius: 25px;</string>
              </sizepolicy>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(16, 16, 16);</string>
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -688,7 +711,7 @@ border-radius: 25px;</string>
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(16, 16, 16);</string>
+             <string notr="true"/>
             </property>
            </widget>
           </item>
@@ -712,7 +735,7 @@ border-radius: 25px;</string>
              </font>
             </property>
             <property name="styleSheet">
-             <string notr="true">background-color: rgb(16, 16, 16);</string>
+             <string notr="true"/>
             </property>
             <item>
              <property name="text">
@@ -824,7 +847,7 @@ border-radius: 25px;</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(16, 16, 16);</string>
+        <string notr="true"/>
        </property>
        <item>
         <property name="text">
@@ -884,7 +907,7 @@ border-radius: 25px;</string>
         </font>
        </property>
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(16, 16, 16);</string>
+        <string notr="true"/>
        </property>
        <item>
         <property name="text">
@@ -954,8 +977,7 @@ border-radius: 25px;</string>
       </font>
      </property>
      <property name="styleSheet">
-      <string notr="true">
-background-color: rgb(65, 65, 65);</string>
+      <string notr="true"/>
      </property>
      <property name="text">
       <string>Done</string>
