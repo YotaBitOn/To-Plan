@@ -37,7 +37,7 @@ class Task(QWidget):
         self.task.task_duration.setText(f'{datetime.datetime.fromtimestamp(self.start_time).strftime("%H:%M")} - {datetime.datetime.fromtimestamp(self.end_time).strftime("%H:%M")}')
         self.task.categ_icon.setIcon(QIcon(f"sources/icons_white/{data['icons'][category]}"))
         bg_color = data['palette'][data['diff_col'][difficulty]]
-        self.task.setStyleSheet(f"""background-color: {bg_color}; border-radius: 20px;""")
+        self.task.setStyleSheet(f"""background-color: rgb({bg_color}); border-radius: 20px;""")
 
         self.task.setMouseTracking(True)
         self.task.setAttribute(Qt.WA_StyledBackground, True)

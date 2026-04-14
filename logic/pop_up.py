@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from PySide6.QtCharts import QLineSeries
 from PySide6.QtUiTools import QUiLoader
 
 #variables
@@ -31,6 +32,9 @@ class Popup():
         self.ui.repeatable_toggle = AnimatedToggle(self.ui)
         self.ui.repeatable_layout.replaceWidget(self.ui.rep_switch, self.ui.repeatable_toggle)
         self.ui.repeatable_toggle.toggled.connect(self.set_popup_repeatable_menu)
+
+
+
 
         self.ui.submit_button.clicked.connect(self.submit)
 
@@ -277,16 +281,16 @@ class Popup():
 
         self.ui.setStyleSheet(f'''
             QWidget {{
-                background-color: {main_color};
-                color: {text_color};
+                background-color: rgb({main_color});
+                color: rgb({text_color});
             }}
 
             QLineEdit, QTextEdit, QComboBox, QTimeEdit {{
-                background-color: {field_color};
+                background-color: rgb({field_color});
             }}
 
             QPushButton {{
-                background-color: {button_color};
+                background-color: rgb{button_color});
             }}
         ''')
 

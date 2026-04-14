@@ -59,7 +59,7 @@
     "month.december": "December",
 
     "analytics.label": "Analytics for",
-    "analytics.tasks_completed": "Tasks Completed",
+    "analytics.tasks_created": "Tasks Created",
     "analytics.tasks_completion_percent": "% of Tasks Completed",
     "analytics.tasks_by_difficulty": "Tasks by Difficulty",
     "analytics.tasks_by_category": "Tasks by Category",

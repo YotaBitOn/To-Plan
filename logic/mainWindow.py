@@ -4,13 +4,15 @@ import json
 import webbrowser
 from traceback import print_tb
 
+from PySide6.QtCharts import QLineSeries, QChart, QChartView, QDateTimeAxis, QValueAxis
 from PySide6.QtCore import QDateTime, Qt
-from PySide6.QtGui import QIcon, QPixmap
-from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget, QFileDialog
+from PySide6.QtGui import QIcon, QPixmap, QBrush, QColor
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QTabWidget, QFileDialog, QSizePolicy
 from PySide6.QtUiTools import QUiLoader
 
 #variables
 from config.env_loader import main_ui, user, data
+from data.data_to_plot import tasks_created_plot
 from data.init_db import cursor, conn
 from logic.appState import state
 
@@ -29,8 +31,8 @@ class MainWindow(QMainWindow):
         self.ui = QUiLoader().load(main_ui, None)
         self.funcs = MWindowFuncs(ui=self.ui)
 
-        self.setUI()
         self.setCustomWidgets()
+        self.setUI()
         self.funcs.loadTasks()
         self.linkFuncs()
         #self.ui.show())
@@ -51,6 +53,24 @@ class MainWindow(QMainWindow):
         from logic.widgets import  AnimatedToggle
         self.ui.repeatable_toggle = AnimatedToggle(self.ui)
         self.ui.repeatable_widget.layout().replaceWidget(self.ui.rep_switch, self.ui.repeatable_toggle)
+
+        ##WIP
+
+        chart = tasks_created_plot(accumulation=1)
+
+        self.ui.tasks_created_cv = QChartView(chart)
+        self.ui.tasks_created_cv.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.tasks_created_cv.setMinimumSize(0, 450);
+
+        parent_layout = self.ui.task_line.parentWidget().layout()
+        parent_layout.replaceWidget(self.ui.task_line, self.ui.tasks_created_cv)
+
+        #parent_layout = self.ui.perc_task_line.parentWidget().layout()
+        #parent_layout.replaceWidget(self.ui.perc_task_line, self.ui.chart_view)
+
+
+
+        ##
 
     def linkFuncs(self):
         #signals
@@ -450,93 +470,104 @@ class MWindowFuncs():
         self.setIcons()
 
         #main
-        self.ui.setStyleSheet(f'''background-color:{main_color};
-                                color:{text_color};''')
+        self.ui.setStyleSheet(f'''background-color:rgb({main_color});
+                                color:rgb({text_color});''')
 
 
         #sections
-        self.ui.main_info_widget.setStyleSheet(f'''background-color:{section_color};
-                                color:{text_color};
+        self.ui.main_info_widget.setStyleSheet(f'''background-color:rgb({section_color});
+                                color:rgb({text_color});
                                 border-radius: 40px;''')
 
-        self.ui.task_steps_widget.setStyleSheet(f'''background-color:{section_color};
-                                        color:{text_color};
+        self.ui.task_steps_widget.setStyleSheet(f'''background-color:rgb({section_color});
+                                        color:rgb({text_color});
                                         border-radius: 40px;''')
 
-        self.ui.repeatable_widget.setStyleSheet(f'''background-color:{section_color};
-                                        color:{text_color};
+        self.ui.repeatable_widget.setStyleSheet(f'''background-color:rgb({section_color});
+                                        color:rgb({text_color});
                                         border-radius: 40px;''')
 
-        self.ui.task_graphs_widget.setStyleSheet(f'''background-color:{section_color};
-                                        color:{text_color};
+        self.ui.task_graphs_widget.setStyleSheet(f'''background-color:rgb({section_color});
+                                        color:rgb({text_color});
                                         border-radius: 40px;''')
 
-        self.ui.tasks_date.setStyleSheet(f'''background-color:{section_color};
-                                        color:{text_color};
+        self.ui.tasks_date.setStyleSheet(f'''background-color:rgb({section_color});
+                                        color:rgb({text_color});
                                         border: none;
                                         border-radius: 15px;''')
         #buttons
-        self.ui.add_task_button.setStyleSheet(f'''background-color:{button_color};
-                                                color:{text_color};
+        self.ui.add_task_button.setStyleSheet(f'''background-color:rgb({button_color});
+                                                color:rgb({text_color});
                                                 border: none;
                                                 border-radius: 15px;''')
 
-        self.ui.add_task_step_button.setStyleSheet(f'''background-color:{button_color};
-                                                        color:{text_color};
+        self.ui.add_task_step_button.setStyleSheet(f'''background-color:rgb({button_color});
+                                                        color:rgb({text_color});
                                                         border: none;
                                                         border-radius: 15px;''')
 
-        self.ui.edit_repeatable_button.setStyleSheet(f'''background-color:{button_color};
-                                                        color:{text_color};
+        self.ui.edit_repeatable_button.setStyleSheet(f'''background-color:rgb({button_color});
+                                                        color:rgb({text_color});
                                                         border: none;
                                                         border-radius: 15px;''')
 
-        self.ui.delete_task.setStyleSheet(f'''background-color:{button_color};
-                                                        color:{text_color};
+        self.ui.delete_task.setStyleSheet(f'''background-color:rgb({button_color});
+                                                        color:rgb({text_color});
                                                         border: none;
                                                         border-radius: 15px;''')
         #fields
-        self.ui.at_timeedit.setStyleSheet(f'''background-color:{field_color};
-                                        color:{text_color};
+        self.ui.at_timeedit.setStyleSheet(f'''background-color:rgb({field_color});
+                                        color:rgb({text_color});
                                         border: none;
                                         border-radius: 10px;''')
 
-        self.ui.due_timeedit.setStyleSheet(f'''background-color:{field_color};
-                                                color:{text_color};
+        self.ui.due_timeedit.setStyleSheet(f'''background-color:rgb({field_color});
+                                                color:rgb({text_color});
                                                 border: none;
                                                 border-radius: 10px;''')
 
-        self.ui.every_box.setStyleSheet(f'''background-color:{field_color};
-                                        color:{text_color};''')
+        self.ui.every_box.setStyleSheet(f'''background-color:rgb({field_color});
+                                        color:rgb({text_color});''')
 
-        self.ui.day_edit_2.setStyleSheet(f'''background-color:{field_color};
-                                                color:{text_color};''')
+        self.ui.day_edit_2.setStyleSheet(f'''background-color:rgb({field_color});
+                                                color:rgb({text_color});''')
 
-        self.ui.day_edit.setStyleSheet(f'''background-color:{field_color};
-                                        color:{text_color};''')
+        self.ui.day_edit.setStyleSheet(f'''background-color:rgb({field_color});
+                                        color:rgb({text_color});''')
 
-        self.ui.mounth_edit.setStyleSheet(f'''background-color:{field_color};
-                                                color:{text_color};''')
+        self.ui.mounth_edit.setStyleSheet(f'''background-color:rgb({field_color});
+                                                color:rgb({text_color});''')
 
-        self.ui.few_days_edit.setStyleSheet(f'''background-color:{field_color};
-                                        color:{text_color};''')
+        self.ui.few_days_edit.setStyleSheet(f'''background-color:rgb({field_color});
+                                        color:rgb({text_color});''')
 
-        self.ui.description_text_edit.setStyleSheet(f'''background-color:{field_color};
-                                                color:{text_color};''')
+        self.ui.description_text_edit.setStyleSheet(f'''background-color:rgb({field_color});
+                                                color:rgb({text_color});''')
 
-        self.ui.difficulty_combobox.setStyleSheet(f'''background-color:{field_color};
-                                              color:{text_color};''')
+        self.ui.difficulty_combobox.setStyleSheet(f'''background-color:rgb({field_color});
+                                              color:rgb({text_color});''')
 
-        self.ui.category_combobox.setStyleSheet(f'''background-color:{field_color};
-                                                color:{text_color};''')
+        self.ui.category_combobox.setStyleSheet(f'''background-color:rgb({field_color});
+                                                color:rgb({text_color});''')
 
-        self.ui.description_input_label.setStyleSheet(f'''background-color:{field_color};
-                                                color:{text_color};''')
+        self.ui.description_input_label.setStyleSheet(f'''background-color:rgb({field_color});
+                                                color:rgb({text_color});''')
 
+        self.ui.graph_scrollwidget.setStyleSheet(f"""
+            #categ_bar_widget, #categ_pie_widget, #diff_bar_widget, #diff_pie_widget, #perc_task_widget, #task_widget {{
+                background-color: rgb({section_color});
+                border: 2px solid black;
+                border-radius: 15px;
+            }}
+
+            #categ_bar_widget, #categ_pie_widget, #diff_bar_widget, #diff_pie_widget, #perc_task_widget, #task_widget * {{
+                background: transparent;
+            }}
+        """)
 
         self.ui.every_stack.setStyleSheet(f"""
         QWidget{{
-        background-color: {field_color};
+        background-color: rgb({field_color});
         border: none;
         border-radius: 10px;
         }}
@@ -547,6 +578,12 @@ class MWindowFuncs():
         border-radius: 25px;
         }}""")
 
+        try:
+            main_color = data['palette'][data['theme'][data['cur_theme']]['section']]
+            r, g, b = map(int, main_color.split(','))
+            self.ui.tasks_created_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
+        except:
+            print('No chart found')
     def changeLang(self):
         data['cur_lang'] = self.ui.lang_box.currentData()
 
@@ -579,7 +616,7 @@ class MWindowFuncs():
 
             # Analytics
             self.ui.analytics_label: "analytics.label",
-            self.ui.task_widget_label: "analytics.tasks_completed",
+            self.ui.task_widget_label: "analytics.tasks_created",
             self.ui.perc_task_label: "analytics.tasks_completion_percent",
             self.ui.diff_bar_label: "analytics.tasks_by_difficulty",
             self.ui.diff_pie_label: "analytics.tasks_by_category",
