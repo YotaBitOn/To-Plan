@@ -81,10 +81,14 @@ class TaskStep():
         self.taskstep = QUiLoader().load(task_step_ui, None)
         self.completed = False
         self.taskstep.stackedWidget.setCurrentIndex(0)
-        self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {data['palette'][data['theme'][data['cur_theme']]['field']]};""")
+        self.taskstep.stackedWidget.setStyleSheet(f"""background-color: {data['palette'][data['theme'][data['cur_theme']]['field']]};
+                                                    border: None;
+                                                    border-radius: 15px;
+                                                    """)
+
+
 
         self.taskstep.task_step_label.setText(f'{self.name}')
-
         self.taskstep.task_step_apply.clicked.connect(lambda : self.confirm_name())
         self.taskstep.task_step_check.clicked.connect(lambda : self.toggle_complete())
         self.taskstep.task_step_edit.clicked.connect(lambda : self.edit_name())
