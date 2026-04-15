@@ -12,7 +12,7 @@ from PySide6.QtUiTools import QUiLoader
 
 #variables
 from config.env_loader import main_ui, user, data
-from data.data_to_plot import tasks_created_plot
+from data.data_to_plot import MyPlot
 from data.init_db import cursor, conn
 from logic.appState import state
 
@@ -55,8 +55,9 @@ class MainWindow(QMainWindow):
         self.ui.repeatable_widget.layout().replaceWidget(self.ui.rep_switch, self.ui.repeatable_toggle)
 
         ##WIP
-
-        chart = tasks_created_plot(accumulation=1)
+        plot = MyPlot()
+        plot.tasks_created_plot(accumulation=0)
+        chart = plot.chart
 
         self.ui.tasks_created_cv = QChartView(chart)
         self.ui.tasks_created_cv.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -65,16 +66,9 @@ class MainWindow(QMainWindow):
         parent_layout = self.ui.task_line.parentWidget().layout()
         parent_layout.replaceWidget(self.ui.task_line, self.ui.tasks_created_cv)
 
-        #parent_layout = self.ui.perc_task_line.parentWidget().layout()
-        #parent_layout.replaceWidget(self.ui.perc_task_line, self.ui.chart_view)
-
-
-
-        ##
-
     def linkFuncs(self):
         #signals
-        signals.complete_task.connect(lambda name: self.funcs.complete_task(task_name=name))
+        signals.complete_task.connect(lambda name: self.funcs.complete_task(taskId=name))
         signals.update_task_info.connect(lambda taksId: self.funcs.set_task_info(taksId))
         signals.update_progress_bar.connect(lambda: self.funcs.update_progress_bar())
         signals.setEmptyPage.connect(lambda name: self.funcs.setEmptyPage(name=name))
@@ -349,13 +343,14 @@ class MWindowFuncs():
 
             conn.commit()
 
-    def complete_task(self, task_name = None):
-        if task_name is None:
-            task_name = state.cur_task
+    def complete_task(self, taskId = None):
+        if taskId is None:
+            taskId = state.cur_task
+        print('fd',taskId)
 
         if state.cur_task is None:
             return
-        if task_name == state.cur_task:
+        if taskId == state.cur_task:
             state.tasks[state.cur_task]['completed'] = not state.tasks[state.cur_task]['completed']
 
             cursor.execute('''UPDATE users SET completed=? WHERE user=? AND id=?''',
@@ -365,11 +360,11 @@ class MWindowFuncs():
             self.check_completion()
 
         else:
-            state.tasks[task_name]['completed'] = not state.tasks[task_name]['completed']
-            if state.tasks[task_name]['completed']:
-                state.tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
+            state.tasks[taskId]['completed'] = not state.tasks[taskId]['completed']
+            if state.tasks[taskId]['completed']:
+                state.tasks[taskId]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
             else:
-                state.tasks[task_name]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle.svg'))
+                state.tasks[taskId]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle.svg'))
 
     def check_completion(self):
         if state.tasks[state.cur_task]['completed']:

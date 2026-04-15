@@ -1,5 +1,6 @@
 import sqlite3, seaborn as sns, matplotlib.pyplot as plt
 import os
+from collections import defaultdict
 
 from PySide6.QtCharts import QLineSeries, QChart, QDateTimeAxis, QValueAxis
 from PySide6.QtCore import QDateTime, Qt
@@ -15,51 +16,85 @@ cursor.execute("SELECT * FROM users")
 
 data = cursor.fetchall()
 
-def print_data():
-    for task in data:
-        print(task)
 
-def tasks_created_plot(accumulation = False):
-    dates = [task[3] for task in data]
+class MyPlot():
+    def __init__(self):
+        self.chart = QChart()
+        self.chart.setAnimationOptions(QChart.SeriesAnimations)
 
-    x = []
-    y = []
-    y_accum = []
-    for date in dates:
-        if date not in x:
-            x.append(date)
-            y.append(dates.count(date))
-            y_accum.append(sum(y))
+        self.setAxis()
+        self.print_data()
 
-    if accumulation:
-        y = y_accum
+    def setAxis(self):
+        self.axisX = QDateTimeAxis()
+        self.axisX.setFormat("dd.MM.yyyy")
+        self.axisX.setTitleText("Дата")
 
-    series = QLineSeries()
+        self.chart.addAxis(self.axisX, Qt.AlignBottom)
 
-    for d_str, val in zip(x, y):
-        # Перетворюємо рядок у QDateTime, а потім у мілісекунди
-        dt = (
-            QDateTime.fromString(d_str, "dd.MM.yyyy"))
-        series.append(dt.toMSecsSinceEpoch(), val)
+        self.axisY = QValueAxis()
+        self.axisY.setTitleText("Показник")
+        self.axisY.setLabelFormat("%d")
 
-    chart = QChart()
-    chart.addSeries(series)
+        self.chart.addAxis(self.axisY, Qt.AlignLeft)
+    def print_data(self):
+        for task in data:
+            print(task)
 
-    axis_x = QDateTimeAxis()
-    axis_x.setFormat("dd.MM.yyyy")  # Формат відображення (напр. 01 Jan 2023)
-    axis_x.setTitleText("Дата")
-    axis_x.setTickCount(len(x))  # Кількість позначок на осі
-    chart.addAxis(axis_x, Qt.AlignBottom)
-    series.attachAxis(axis_x)
+    def tasks_created_plot(self, accumulation = False):
 
-    # --- Налаштування осі Y (Числа) ---
-    axis_y = QValueAxis()
-    axis_y.setTitleText("Показник")
-    axis_y.setLabelFormat("%d")  # Ціле число
-    chart.addAxis(axis_y, Qt.AlignLeft)
-    series.attachAxis(axis_y)
+        stats = defaultdict(lambda: {"created": 0, "completed": 0})
 
-    return chart
+        for task in data:
+            date = task[3]
+            completed = int(task[8])
+            stats[date]["created"] += 1
+            stats[date]["completed"] += completed
+
+        x = sorted(
+            stats.keys(),
+            key=lambda d: QDateTime.fromString(d, "dd.MM.yyyy")
+        )
+
+        created_y = []
+        completed_y = []
+
+        for d in x:
+            created_y.append(stats[d]["created"])
+            completed_y.append(stats[d]["completed"])
+
+        if accumulation:
+            for i in range(1, len(created_y)):
+                created_y[i] += created_y[i - 1]
+                completed_y[i] += completed_y[i - 1]
+
+
+        t_created = QLineSeries()
+        t_completed = QLineSeries()
+
+        for d_str, val in zip(x, created_y):
+            dt = (QDateTime.fromString(d_str, "dd.MM.yyyy"))
+            t_created.append(dt.toMSecsSinceEpoch(), val)
+
+        for d_str, val in zip(x, completed_y):
+            dt = (QDateTime.fromString(d_str, "dd.MM.yyyy"))
+            t_completed.append(dt.toMSecsSinceEpoch(), val)
+
+
+        self.chart.addSeries(t_created)
+        self.chart.addSeries(t_completed)
+
+        self.axisX.setTickCount(min(len(x), 10))
+        max_val = max(created_y + completed_y)
+        self.axisY.setRange(0, max_val)
+
+        t_created.attachAxis(self.axisX)
+        t_completed.attachAxis(self.axisX)
+
+        t_created.attachAxis(self.axisY)
+        t_completed.attachAxis(self.axisY)
+
+
 #x,y = tasks_created_plot(0)
 #
 #sns.lineplot(x=x,y=y)

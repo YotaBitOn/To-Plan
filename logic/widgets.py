@@ -44,7 +44,7 @@ class Task(QWidget):
 
 
         self.task.installEventFilter(self)
-        self.task.task_check.clicked.connect(lambda : signals.complete_task.emit(self.name))
+        self.task.task_check.clicked.connect(lambda : signals.complete_task.emit(self.id))
 
         if parent:
             parent.layout().addWidget(self.task)
