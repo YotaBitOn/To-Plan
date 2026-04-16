@@ -32,7 +32,9 @@ CREATE TABLE IF NOT EXISTS users (
     rep_option INTEGER,
     rep_vals TEXT,
     task_steps_infos TEXT, 
-    description TEXT
+    description TEXT,
+    created_at INTEGER,
+    completed_at INTEGER
 )
 """)
 

@@ -5,17 +5,21 @@ from collections import defaultdict
 from PySide6.QtCharts import QLineSeries, QChart, QDateTimeAxis, QValueAxis
 from PySide6.QtCore import QDateTime, Qt
 
+from config.env_loader import drop_db_mode
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, './user_data.db')
 
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
+if not drop_db_mode:
+    cursor.execute("SELECT * FROM users")
 
-cursor.execute("SELECT * FROM users")
+    data = cursor.fetchall()
 
-data = cursor.fetchall()
-
+else:
+    data = []
 
 class MyPlot():
     def __init__(self):
@@ -42,7 +46,8 @@ class MyPlot():
             print(task)
 
     def tasks_created_plot(self, accumulation = False):
-
+        if len(data) == 0:
+            return
         stats = defaultdict(lambda: {"created": 0, "completed": 0})
 
         for task in data:

@@ -96,6 +96,7 @@ class Popup():
         end_time = convert_qtTime_int(self.ui.due_timeedit.time())
 
         task_date = datetime_str(state.cur_date)
+        created_at = datetime.datetime.now().timestamp()
         ### repeatable setting
         next_occurrence = rep_option = rep_vals = None
         if _task_repeatable:
@@ -134,11 +135,27 @@ class Popup():
         rep_option,
         rep_vals,
         task_steps_infos,
-        description
+        description,
+        created_at,
+        completed_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (taskId, user, _task_name, task_date, start_time, end_time, _task_difficulty, _task_category, 0,
-        _task_repeatable, rep_option, str_rep_vals, '', _task_description))
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (taskId,
+         user,
+         _task_name,
+         task_date,
+         start_time,
+         end_time,
+         _task_difficulty,
+         _task_category,
+         0,
+        _task_repeatable,
+         rep_option,
+         str_rep_vals,
+         '',
+         _task_description,
+         created_at,
+         0))
         conn.commit()  #<-----------IMPORTANT (off for test cases)
 
         ### task widget setting

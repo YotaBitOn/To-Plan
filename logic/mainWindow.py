@@ -345,6 +345,7 @@ class MWindowFuncs():
 
     def complete_task(self, taskId = None):
         print('Input task "',taskId,'"')
+        print('Current task is: ', state.cur_task)
         if taskId == None:
             print('Task not found, charnging to current task', state.cur_task)
             taskId = state.cur_task
@@ -352,17 +353,21 @@ class MWindowFuncs():
 
         if state.cur_task is None:
             return
+
+        state.tasks[taskId]['completed'] = not state.tasks[taskId]['completed']
+
+        completed_at = 0
+        if state.tasks[taskId]['completed']:
+            completed_at = datetime.datetime.now().timestamp()
+
+        cursor.execute('''UPDATE users SET completed=?, completed_at=? WHERE user=? AND id=?''',
+                       (state.tasks[taskId]['completed'], completed_at , user, taskId))
+        conn.commit()
+
         if taskId == state.cur_task:
-            state.tasks[state.cur_task]['completed'] = not state.tasks[state.cur_task]['completed']
-
-            cursor.execute('''UPDATE users SET completed=? WHERE user=? AND id=?''',
-                           (state.tasks[state.cur_task]['completed'], user, state.cur_task))
-            conn.commit()
-
             self.check_completion()
 
         else:
-            state.tasks[taskId]['completed'] = not state.tasks[taskId]['completed']
             if state.tasks[taskId]['completed']:
                 state.tasks[taskId]['taskWidget'].task.task_check.setIcon(QIcon('sources/icons_white/circle-check-big.svg'))
             else:
@@ -889,7 +894,9 @@ class MWindowFuncs():
                     rep_vals,                   
                     task_steps_infos,
                     description,
-                    id              
+                    id,
+                    created_at,
+                    completed_at              
                 FROM users WHERE user=? AND date=?''' , (user,cur_date))
 
         data = cursor.fetchall()
@@ -919,7 +926,8 @@ class MWindowFuncs():
                     taskSteps = task[10]
                     description = task[11]
                     taskId = task[12]
-
+                    created_at = task[13]
+                    completed_at = task[14]
                     state.cur_task = taskId
 
 
@@ -1010,8 +1018,7 @@ class MWindowFuncs():
                     print(f'Problem for task #{task[12]} occured: \n', e)
                     delete_task = input(f'Task #{task[12]} is corrupted, delete it?(y/n)')
                     if delete_task.lower() == 'y':
-                        cursor.execute('''
-                        DELETE FROM users WHERE id=?''', (task[12],))
+                        cursor.execute('''DELETE FROM users WHERE id=?''', (task[12],))
 
                         conn.commit()
 
