@@ -1,8 +1,11 @@
 import sys
+import warnings
 
 from PySide6.QtWidgets import QApplication
 
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 def main():
+
     app = QApplication(sys.argv)
 
     from logic.mainWindow import mw

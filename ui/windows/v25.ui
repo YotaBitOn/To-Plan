@@ -195,8 +195,8 @@ QPushButton:checked {
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>485</width>
-               <height>586</height>
+               <width>84</width>
+               <height>36</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">
@@ -300,7 +300,7 @@ border-radius: 15px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>699</width>
+                 <width>579</width>
                  <height>1863</height>
                 </rect>
                </property>
@@ -2343,7 +2343,7 @@ border-radius: 15px;</string>
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-363</y>
              <width>1221</width>
              <height>1726</height>
             </rect>
@@ -2378,7 +2378,7 @@ border-radius: 15px;</string>
                   </font>
                  </property>
                  <property name="text">
-                  <string>Tasks completed</string>
+                  <string>Tasks created / completed</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -2420,7 +2420,7 @@ border-radius: 15px;</string>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="perc_task_line" native="true">
+                <widget class="QWidget" name="perc_task_pie" native="true">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -2608,8 +2608,8 @@ border-radius: 15px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1235</width>
-             <height>730</height>
+             <width>651</width>
+             <height>442</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_28">
@@ -3089,8 +3089,8 @@ border-radius: 100px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>404</width>
-                 <height>308</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_27"/>
@@ -3365,8 +3365,8 @@ border-radius: 15px;
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>799</width>
-                  <height>201</height>
+                  <width>98</width>
+                  <height>28</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_2"/>

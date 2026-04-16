@@ -2,7 +2,7 @@ import sqlite3, seaborn as sns, matplotlib.pyplot as plt
 import os
 from collections import defaultdict
 
-from PySide6.QtCharts import QLineSeries, QChart, QDateTimeAxis, QValueAxis
+from PySide6.QtCharts import QLineSeries, QChart, QDateTimeAxis, QValueAxis, QPieSeries
 from PySide6.QtCore import QDateTime, Qt
 
 from config.env_loader import drop_db_mode
@@ -26,7 +26,6 @@ class MyPlot():
         self.chart = QChart()
         self.chart.setAnimationOptions(QChart.SeriesAnimations)
 
-        self.setAxis()
         self.print_data()
 
     def setAxis(self):
@@ -46,6 +45,8 @@ class MyPlot():
             print(task)
 
     def tasks_created_plot(self, accumulation = False):
+        self.setAxis()
+
         if len(data) == 0:
             return
         stats = defaultdict(lambda: {"created": 0, "completed": 0})
@@ -99,7 +100,23 @@ class MyPlot():
         t_created.attachAxis(self.axisY)
         t_completed.attachAxis(self.axisY)
 
+    def completed_ratio(self):
+        #('piEZSKOuxCHKJYbnPgMKm', 'Yasinets', 'Task #0', '16.04.2026', 0, 0, 'very_easy', 'sport', 0, 0, None, '', '',
+        # '', 1776333835.380634, 0)
 
+        completed_ammo = sum([d[8] for d in data])
+        not_completed_ammo = len(data) - completed_ammo
+
+        completed_pie = QPieSeries()
+        completed_pie.append("Not Completed", not_completed_ammo)
+        completed_pie.append("Completed", completed_ammo)
+
+        slices = completed_pie.slices()
+        slices[0].setExploded(True)
+        slices[0].setLabelVisible(True)
+
+        self.chart.addSeries(completed_pie)
+        self.chart.legend().setAlignment(Qt.AlignBottom)
 #x,y = tasks_created_plot(0)
 #
 #sns.lineplot(x=x,y=y)

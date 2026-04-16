@@ -54,10 +54,10 @@ class MainWindow(QMainWindow):
         self.ui.repeatable_toggle = AnimatedToggle(self.ui)
         self.ui.repeatable_widget.layout().replaceWidget(self.ui.rep_switch, self.ui.repeatable_toggle)
 
-        ##WIP
-        plot = MyPlot()
-        plot.tasks_created_plot(accumulation=0)
-        chart = plot.chart
+        ##1st, line plot
+        created_completed_line = MyPlot()
+        created_completed_line.tasks_created_plot(accumulation=0)
+        chart = created_completed_line.chart
 
         self.ui.tasks_created_cv = QChartView(chart)
         self.ui.tasks_created_cv.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -65,7 +65,20 @@ class MainWindow(QMainWindow):
 
         parent_layout = self.ui.task_line.parentWidget().layout()
         parent_layout.replaceWidget(self.ui.task_line, self.ui.tasks_created_cv)
+        ##second, pie plot
+        completed_ratio_pie = MyPlot()
+        completed_ratio_pie.completed_ratio()
+        chart = completed_ratio_pie.chart
 
+        self.ui.completed_ratio_cv = QChartView(chart)
+        self.ui.completed_ratio_cv.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.completed_ratio_cv.setMinimumSize(0, 450);
+
+        parent_layout = self.ui.perc_task_pie.parentWidget().layout()
+        parent_layout.replaceWidget(self.ui.perc_task_pie, self.ui.completed_ratio_cv)
+
+
+        #make it using cycle ^
     def linkFuncs(self):
         #signals
         signals.complete_task.connect(lambda name: self.funcs.complete_task(taskId=name))
@@ -344,12 +357,8 @@ class MWindowFuncs():
             conn.commit()
 
     def complete_task(self, taskId = None):
-        print('Input task "',taskId,'"')
-        print('Current task is: ', state.cur_task)
         if taskId == None:
-            print('Task not found, charnging to current task', state.cur_task)
             taskId = state.cur_task
-        print('Output task',taskId, '\n\n\n')
 
         if state.cur_task is None:
             return
@@ -430,10 +439,7 @@ class MWindowFuncs():
 
         new_date_str = datetime_str(new_date)
 
-        print(state.dates)
-        print(new_date_str, end=' ')
         if new_date_str not in state.dates:
-            print('is not in dates')
 
             #date_page = QWidget()
             #date_page.setObjectName(new_date_str)
@@ -444,7 +450,6 @@ class MWindowFuncs():
             state.dates.append(new_date_str)
 
         else:
-            print('req is in dates')
             date_page = self.ui.task_list_stack.findChild(QWidget, new_date_str)
             self.ui.task_list_stack.setCurrentWidget(date_page)
         self.ui.tasks_date_label.setText(new_date_str)
@@ -584,6 +589,8 @@ class MWindowFuncs():
             main_color = data['palette'][data['theme'][data['cur_theme']]['section']]
             r, g, b = map(int, main_color.split(','))
             self.ui.tasks_created_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
+            self.ui.completed_ratio_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
+
         except:
             print('No chart found')
     def changeLang(self):
@@ -955,7 +962,6 @@ class MWindowFuncs():
                             'rep_vals': rep_vals
                         }
                     }
-                    print(taskId, name)
                     task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,
                                        parent=None)  # change it
                     state.tasks[taskId]['taskWidget'] = task_widget
