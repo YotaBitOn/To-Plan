@@ -1,4 +1,5 @@
 import datetime
+from nanoid import generate
 import json
 
 from PySide6.QtCharts import QLineSeries
@@ -79,7 +80,7 @@ class Popup():
     def submit(self):
         ### variables
         _task_name = self.ui.name_edit.text()
-        taskId = int(datetime.datetime.now().timestamp())
+        taskId = generate()
 
         state.cur_task = taskId
         _task_repeatable = self.ui.repeatable_toggle._checked
