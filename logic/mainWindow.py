@@ -344,9 +344,11 @@ class MWindowFuncs():
             conn.commit()
 
     def complete_task(self, taskId = None):
-        if taskId is None:
+        print('Input task "',taskId,'"')
+        if taskId == None:
+            print('Task not found, charnging to current task', state.cur_task)
             taskId = state.cur_task
-        print('fd',taskId)
+        print('Output task',taskId, '\n\n\n')
 
         if state.cur_task is None:
             return
@@ -945,6 +947,7 @@ class MWindowFuncs():
                             'rep_vals': rep_vals
                         }
                     }
+                    print(taskId, name)
                     task_widget = Task(taskId, name, description, difficulty, category, startTime, endTime,
                                        parent=None)  # change it
                     state.tasks[taskId]['taskWidget'] = task_widget
