@@ -1,11 +1,13 @@
+import random
 import sqlite3, seaborn as sns, matplotlib.pyplot as plt
 import os
 from collections import defaultdict
 
 from PySide6.QtCharts import QLineSeries, QChart, QDateTimeAxis, QValueAxis, QPieSeries
 from PySide6.QtCore import QDateTime, Qt
+from PySide6.QtGui import QColor
 
-from config.env_loader import drop_db_mode
+from config.env_loader import drop_db_mode, data
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = os.path.join(BASE_DIR, './user_data.db')
@@ -16,10 +18,10 @@ cursor = conn.cursor()
 if not drop_db_mode:
     cursor.execute("SELECT * FROM users")
 
-    data = cursor.fetchall()
+    db_data = cursor.fetchall()
 
 else:
-    data = []
+    db_data = []
 
 class MyPlot():
     def __init__(self):
@@ -41,17 +43,17 @@ class MyPlot():
 
         self.chart.addAxis(self.axisY, Qt.AlignLeft)
     def print_data(self):
-        for task in data:
+        for task in db_data:
             print(task)
 
     def tasks_created_plot(self, accumulation = False):
         self.setAxis()
 
-        if len(data) == 0:
+        if len(db_data) == 0:
             return
         stats = defaultdict(lambda: {"created": 0, "completed": 0})
 
-        for task in data:
+        for task in db_data:
             date = task[3]
             completed = int(task[8])
             stats[date]["created"] += 1
@@ -104,20 +106,74 @@ class MyPlot():
         #('piEZSKOuxCHKJYbnPgMKm', 'Yasinets', 'Task #0', '16.04.2026', 0, 0, 'very_easy', 'sport', 0, 0, None, '', '',
         # '', 1776333835.380634, 0)
 
-        completed_ammo = sum([d[8] for d in data])
-        not_completed_ammo = len(data) - completed_ammo
+        completed_ammo = sum([d[8] for d in db_data])
+        not_completed_ammo = len(db_data) - completed_ammo
 
         completed_pie = QPieSeries()
         completed_pie.append("Not Completed", not_completed_ammo)
         completed_pie.append("Completed", completed_ammo)
 
         slices = completed_pie.slices()
-        slices[0].setExploded(True)
-        slices[0].setLabelVisible(True)
+
+        for slice in completed_pie.slices():
+            slice.hovered.connect(lambda state, s=slice: self.pie_on_hovered(s, state))
+
 
         self.chart.addSeries(completed_pie)
         self.chart.legend().setAlignment(Qt.AlignBottom)
-#x,y = tasks_created_plot(0)
-#
-#sns.lineplot(x=x,y=y)
-#plt.show()
+
+    def diff_ratio(self):
+        diffs = [d[6] for d in db_data]
+
+        diff_pie = QPieSeries()
+
+        added = set()
+        for diff in diffs:
+            if diff not in added:
+                slice = diff_pie.append(f"{diff}",diffs.count(diff))
+
+                color = data['diff_col'][diff]
+                r,g,b = map(int, data['palette'][color].split(','))
+                slice.setBrush(QColor(r,g,b))
+
+                added.add(diff)
+
+        for slice in diff_pie.slices():
+            slice.hovered.connect(lambda state, s=slice: self.pie_on_hovered(s, state))
+
+        self.chart.addSeries(diff_pie)
+        self.chart.legend().setAlignment(Qt.AlignBottom)
+
+    def categ_ratio(self):
+        categs = [d[7] for d in db_data]
+
+        categ_pie = QPieSeries()
+
+        added = set()
+        banned_colors = ["239, 239, 239", "215, 215, 215", "190, 190, 190", "65, 65, 65", "40, 40, 40", "16, 16, 16"]
+        for categ in categs:
+            if categ not in added:
+
+                slice = categ_pie.append(f"{categ}",categs.count(categ))
+
+                palette = list(data['palette'].values())
+
+                color = random.choice(palette)
+                while color in banned_colors:
+                    color = random.choice(palette)
+                banned_colors.append(color)
+
+                r,g,b = map(int, color.split(','))
+
+                slice.setBrush(QColor(r,g,b))
+
+                added.add(categ)
+        for slice in categ_pie.slices():
+            slice.hovered.connect(lambda state, s=slice: self.pie_on_hovered(s, state))
+
+        self.chart.addSeries(categ_pie)
+        self.chart.legend().setAlignment(Qt.AlignBottom)
+
+    def pie_on_hovered(self, slice, state):
+        slice.setExploded(state)
+        slice.setLabelVisible(state)

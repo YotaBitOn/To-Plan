@@ -77,8 +77,34 @@ class MainWindow(QMainWindow):
         parent_layout = self.ui.perc_task_pie.parentWidget().layout()
         parent_layout.replaceWidget(self.ui.perc_task_pie, self.ui.completed_ratio_cv)
 
+        #4, pie plot
 
-        #make it using cycle ^
+        diff_ratio_pie = MyPlot()
+        diff_ratio_pie.diff_ratio()
+        chart = diff_ratio_pie.chart
+
+        self.ui.diff_ratio_cv = QChartView(chart)
+        self.ui.diff_ratio_cv.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.diff_ratio_cv.setMinimumSize(0, 350);
+
+        parent_layout = self.ui.diff_pie.parentWidget().layout()
+        parent_layout.replaceWidget(self.ui.diff_pie, self.ui.diff_ratio_cv)
+
+        #6, pie plot
+
+        categ_ratio_pie = MyPlot()
+        categ_ratio_pie.categ_ratio()
+        chart = categ_ratio_pie.chart
+
+        self.ui.categ_ratio_cv = QChartView(chart)
+        self.ui.categ_ratio_cv.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.categ_ratio_cv.setMinimumSize(0, 350);
+
+        parent_layout = self.ui.categ_pie.parentWidget().layout()
+        parent_layout.replaceWidget(self.ui.categ_pie, self.ui.categ_ratio_cv)
+
+
+        #maybe make it using cycle ^
     def linkFuncs(self):
         #signals
         signals.complete_task.connect(lambda name: self.funcs.complete_task(taskId=name))
@@ -590,6 +616,8 @@ class MWindowFuncs():
             r, g, b = map(int, main_color.split(','))
             self.ui.tasks_created_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
             self.ui.completed_ratio_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
+            self.ui.diff_ratio_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
+            self.ui.categ_ratio_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
 
         except:
             print('No chart found')
@@ -628,8 +656,8 @@ class MWindowFuncs():
             self.ui.task_widget_label: "analytics.tasks_created",
             self.ui.perc_task_label: "analytics.tasks_completion_percent",
             self.ui.diff_bar_label: "analytics.tasks_by_difficulty",
-            self.ui.diff_pie_label: "analytics.tasks_by_category",
-            self.ui.categ_bar_label: "analytics.difficulty_distribution",
+            self.ui.diff_pie_label: "analytics.difficulty_distribution",
+            self.ui.categ_bar_label: "analytics.tasks_by_category",
             self.ui.categ_pie_label: "analytics.category_distribution",
 
             # Settings
