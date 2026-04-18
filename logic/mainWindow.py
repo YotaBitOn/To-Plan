@@ -484,7 +484,7 @@ class MWindowFuncs():
     def changeTheme(self):
         data['cur_theme'] = self.ui.theme_box.currentData()
 
-        with open("config/config.json", "w") as f:
+        with open("config/config.json", "w", encoding='utf-8') as f:
             json.dump(data, f, indent=4)
 
         self.setTheme()
@@ -624,7 +624,7 @@ class MWindowFuncs():
     def changeLang(self):
         data['cur_lang'] = self.ui.lang_box.currentData()
 
-        with open("config/config.json", "w") as f:
+        with open("config/config.json", "w", encoding='utf-8') as f:
             json.dump(data, f, indent=4)
 
         self.setLang()
@@ -634,7 +634,7 @@ class MWindowFuncs():
 
         cur_lang = data['cur_lang']
 
-        with open(f"config/langs/{cur_lang}.json", "r") as f:
+        with open(f"config/langs/{cur_lang}.json", "r", encoding='utf-8') as f:
             lang = json.load(f)
 
         translations_map = {
@@ -846,7 +846,7 @@ class MWindowFuncs():
     def changePanelPos(self):
         data['panel_pos'] = self.ui.panel_loc_box.currentData()
 
-        with open("config/config.json", "w") as f:
+        with open("config/config.json", "w", encoding='utf-8') as f:
             json.dump(data, f, indent=4)
 
         self.setPanelPos()

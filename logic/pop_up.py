@@ -193,10 +193,10 @@ class Popup():
         self.ui.close()
 
     def setLang(self):
-        with open(f"config/config.json", "r") as f:
+        with open(f"config/config.json", "r", encoding='utf-8') as f:
             data = json.load(f)
         cur_lang = data['cur_lang']
-        with open(f"config/langs/{cur_lang}.json", "r") as f:
+        with open(f"config/langs/{cur_lang}.json", "r", encoding='utf-8') as f:
             lang = json.load(f)
 
         translations_map = {
@@ -287,7 +287,7 @@ class Popup():
             combo.blockSignals(False)
 
     def setTheme(self):
-        with open(f"config/config.json", "r") as f:
+        with open(f"config/config.json", "r", encoding='utf-8') as f:
             data = json.load(f)
 
         cur_theme = data['cur_theme']
