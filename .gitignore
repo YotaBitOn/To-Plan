@@ -2,3 +2,5 @@ utils/temp.py
 utils/CodeINeedToPutSomewhere.py
 user_data.db-journal
 .venv/
+__pycache__/
+*.pyc

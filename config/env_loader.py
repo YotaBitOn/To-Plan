@@ -20,7 +20,7 @@ user = os.getenv('user')
 drop_db_mode = int(os.getenv('drop_db_mode'))
 
 #config
-with open("config/config.json", "r") as f:
+with open("config/config.json", "r", encoding='utf-8') as f:
     data = json.load(f)
 
 cur_theme = data['cur_theme']
