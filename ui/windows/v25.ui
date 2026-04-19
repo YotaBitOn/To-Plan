@@ -195,8 +195,8 @@ QPushButton:checked {
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>84</width>
-               <height>36</height>
+               <width>485</width>
+               <height>586</height>
               </rect>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout">
@@ -300,7 +300,7 @@ border-radius: 15px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>579</width>
+                 <width>699</width>
                  <height>1863</height>
                 </rect>
                </property>
@@ -2343,9 +2343,9 @@ border-radius: 15px;</string>
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-363</y>
+             <y>-157</y>
              <width>1221</width>
-             <height>1726</height>
+             <height>1765</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -2399,20 +2399,23 @@ border-radius: 15px;</string>
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="perc_task_widget" native="true">
-              <property name="styleSheet">
-               <string notr="true"/>
+             <widget class="QWidget" name="diff_bar_widget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>450</height>
+               </size>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_13">
+              <layout class="QVBoxLayout" name="verticalLayout_14">
                <item>
-                <widget class="QLabel" name="perc_task_label">
+                <widget class="QLabel" name="diff_bar_label">
                  <property name="font">
                   <font>
                    <pointsize>20</pointsize>
                   </font>
                  </property>
                  <property name="text">
-                  <string>% of tasks completed</string>
+                  <string>Tasks completed with theit difficulty</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -2420,7 +2423,7 @@ border-radius: 15px;</string>
                 </widget>
                </item>
                <item>
-                <widget class="QWidget" name="perc_task_pie" native="true">
+                <widget class="QWidget" name="diff_bar" native="true">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -2435,20 +2438,20 @@ border-radius: 15px;</string>
             <item>
              <layout class="QHBoxLayout" name="diff_layout" stretch="1,1">
               <item>
-               <widget class="QWidget" name="diff_bar_widget" native="true">
+               <widget class="QWidget" name="perc_task_widget" native="true">
                 <property name="styleSheet">
                  <string notr="true"/>
                 </property>
-                <layout class="QVBoxLayout" name="verticalLayout_14">
+                <layout class="QVBoxLayout" name="verticalLayout_13">
                  <item>
-                  <widget class="QLabel" name="diff_bar_label">
+                  <widget class="QLabel" name="perc_task_label">
                    <property name="font">
                     <font>
                      <pointsize>20</pointsize>
                     </font>
                    </property>
                    <property name="text">
-                    <string>Tasks completed with theit difficulty</string>
+                    <string>% of tasks completed</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -2456,7 +2459,7 @@ border-radius: 15px;</string>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QWidget" name="diff_bar" native="true">
+                  <widget class="QWidget" name="perc_task_pie" native="true">
                    <property name="minimumSize">
                     <size>
                      <width>0</width>
@@ -2608,8 +2611,8 @@ border-radius: 15px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>651</width>
-             <height>442</height>
+             <width>1235</width>
+             <height>730</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_28">
@@ -3089,8 +3092,8 @@ border-radius: 100px;</string>
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>98</width>
-                 <height>28</height>
+                 <width>404</width>
+                 <height>308</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_27"/>
@@ -3365,8 +3368,8 @@ border-radius: 15px;
                  <rect>
                   <x>0</x>
                   <y>0</y>
-                  <width>98</width>
-                  <height>28</height>
+                  <width>799</width>
+                  <height>201</height>
                  </rect>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_2"/>

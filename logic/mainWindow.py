@@ -101,9 +101,22 @@ class MainWindow(QMainWindow):
         self.ui.categ_ratio_cv.setMinimumSize(0, 350);
 
         parent_layout = self.ui.categ_pie.parentWidget().layout()
+        print('ge 0', parent_layout)
         parent_layout.replaceWidget(self.ui.categ_pie, self.ui.categ_ratio_cv)
 
 
+        #7, bar plot
+        diff_day_bar = MyPlot()
+        diff_day_bar.day_diff_ratio()
+        chart = diff_day_bar.chart
+#
+        self.ui.diff_day_cv = QChartView(chart)
+        self.ui.diff_day_cv.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.ui.diff_day_cv.setMinimumSize(0, 450);
+#
+        parent_layout = self.ui.diff_bar.parentWidget().layout()
+        print('ge ',parent_layout)
+        parent_layout.replaceWidget(self.ui.diff_bar, self.ui.diff_day_cv)
         #maybe make it using cycle ^
     def linkFuncs(self):
         #signals
@@ -618,6 +631,7 @@ class MWindowFuncs():
             self.ui.completed_ratio_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
             self.ui.diff_ratio_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
             self.ui.categ_ratio_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
+            self.ui.diff_day_cv.chart().setBackgroundBrush(QBrush(QColor(r, g, b)))
 
         except:
             print('No chart found')

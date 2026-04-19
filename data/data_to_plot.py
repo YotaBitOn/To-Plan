@@ -1,9 +1,10 @@
 import random
-import sqlite3, seaborn as sns, matplotlib.pyplot as plt
+import sqlite3
 import os
 from collections import defaultdict
 
-from PySide6.QtCharts import QLineSeries, QChart, QDateTimeAxis, QValueAxis, QPieSeries
+from PySide6.QtCharts import QLineSeries, QChart, QDateTimeAxis, QValueAxis, QPieSeries, QStackedBarSeries, QBarSet, \
+    QBarCategoryAxis
 from PySide6.QtCore import QDateTime, Qt
 from PySide6.QtGui import QColor
 
@@ -28,8 +29,7 @@ class MyPlot():
         self.chart = QChart()
         self.chart.setAnimationOptions(QChart.SeriesAnimations)
 
-        self.print_data()
-
+        #self.print_data()
     def setAxis(self):
         self.axisX = QDateTimeAxis()
         self.axisX.setFormat("dd.MM.yyyy")
@@ -42,6 +42,7 @@ class MyPlot():
         self.axisY.setLabelFormat("%d")
 
         self.chart.addAxis(self.axisY, Qt.AlignLeft)
+
     def print_data(self):
         for task in db_data:
             print(task)
@@ -177,3 +178,63 @@ class MyPlot():
     def pie_on_hovered(self, slice, state):
         slice.setExploded(state)
         slice.setLabelVisible(state)
+
+    def day_diff_ratio(self):
+        #self.setAxis()
+
+        if len(db_data) == 0:
+            return
+        used_dates = set()
+
+        day_diff_bar = QStackedBarSeries()
+
+        hash =  [[task[3], task[6]] for task in db_data]
+        hash = sorted(hash, key=lambda x: x[0]) #change to qdate
+        dates = sorted(list(set([h[0] for h in hash])))
+        print(dates)
+
+        bar_very_easy = QBarSet("very_easy")
+        bar_easy = QBarSet("easy")
+        bar_medium = QBarSet("medium")
+        bar_hard = QBarSet("hard")
+
+        color = data['diff_col']['very_easy']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_very_easy.setBrush(QColor(r, g, b))
+
+        color = data['diff_col']['easy']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_easy.setBrush(QColor(r, g, b))
+
+        color = data['diff_col']['medium']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_medium.setBrush(QColor(r, g, b))
+
+        color = data['diff_col']['hard']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_hard.setBrush(QColor(r, g, b))
+
+
+        for date in dates:
+
+            very_easy_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'very_easy')))
+            easy_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'easy')))
+            medium_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'medium')))
+            hard_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'hard')))
+
+            bar_very_easy << very_easy_ammo
+            bar_easy << easy_ammo
+            bar_medium << medium_ammo
+            bar_hard << hard_ammo
+
+        day_diff_bar.append(bar_very_easy)
+        day_diff_bar.append(bar_easy)
+        day_diff_bar.append(bar_medium)
+        day_diff_bar.append(bar_hard)
+
+        self.chart.addSeries(day_diff_bar)
+
+        axis = QBarCategoryAxis()
+        axis.append(dates)
+        self.chart.addAxis(axis, Qt.AlignBottom)
+        day_diff_bar.attachAxis(axis)
