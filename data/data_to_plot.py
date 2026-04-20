@@ -157,15 +157,8 @@ class MyPlot():
 
                 slice = categ_pie.append(f"{categ}",categs.count(categ))
 
-                palette = list(data['palette'].values())
-
-                color = random.choice(palette)
-                while color in banned_colors:
-                    color = random.choice(palette)
-                banned_colors.append(color)
-
-                r,g,b = map(int, color.split(','))
-
+                color = data['categ_col'][categ]
+                r, g, b = map(int, data['palette'][color].split(','))
                 slice.setBrush(QColor(r,g,b))
 
                 added.add(categ)
@@ -176,18 +169,14 @@ class MyPlot():
         self.chart.legend().setAlignment(Qt.AlignBottom)
 
     def day_diff_ratio(self):
-        #self.setAxis()
-
         if len(db_data) == 0:
             return
-        used_dates = set()
 
         day_diff_bar = QStackedBarSeries()
 
         hash =  [[task[3], task[6]] for task in db_data]
         hash = sorted(hash, key=lambda x: x[0]) #change to qdate
         dates = sorted(list(set([h[0] for h in hash])))
-        print(dates)
 
         bar_very_easy = QBarSet("very_easy")
         bar_easy = QBarSet("easy")
@@ -235,6 +224,46 @@ class MyPlot():
         self.chart.addAxis(axis, Qt.AlignBottom)
         day_diff_bar.attachAxis(axis)
 
+    def day_categ_ratio(self):
+        if len(db_data) == 0:
+            return
+
+        day_categ_bar = QStackedBarSeries()
+
+        hash =  [[task[3], task[7]] for task in db_data]
+        hash = sorted(hash, key=lambda x: x[0]) #change to qdate
+        dates = sorted(list(set([h[0] for h in hash])))
+        print(dates)
+        categs = []
+
+        for categ in data['categ_col']:
+            categ_bar = QBarSet(categ)
+
+            color = data['categ_col'][categ]
+            r, g, b = map(int, data['palette'][color].split(','))
+            categ_bar.setBrush(QColor(r, g, b))
+
+            categs.append([categ,categ_bar])
+
+
+        for date in dates:
+
+            for categ in range( len(categs) ):
+                categ_name = categs[categ][0]
+
+                categ_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[7] == categ_name)))
+
+                categs[categ][1] << categ_ammo
+
+        for categ in range( len(categs) ):
+            day_categ_bar.append(categs[categ][1] << categ_ammo)
+
+        self.chart.addSeries(day_categ_bar)
+
+        axis = QBarCategoryAxis()
+        axis.append(dates)
+        self.chart.addAxis(axis, Qt.AlignBottom)
+        day_categ_bar.attachAxis(axis)
 
     def pie_on_hovered(self, slice, state):
         slice.setExploded(state)

@@ -104,7 +104,7 @@ border-radius: 15px;</string>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>sources/icons_white/chevron-left.svg</normaloff>sources/icons_white/chevron-left.svg</iconset>
+                 <normaloff>../../../../.designer/backup/sources/icons_white/chevron-left.svg</normaloff>../../../../.designer/backup/sources/icons_white/chevron-left.svg</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -145,7 +145,7 @@ border-radius: 15px;</string>
                </property>
                <property name="icon">
                 <iconset>
-                 <normaloff>sources/icons_white/chevron-right.svg</normaloff>sources/icons_white/chevron-right.svg</iconset>
+                 <normaloff>../../../../.designer/backup/sources/icons_white/chevron-right.svg</normaloff>../../../../.designer/backup/sources/icons_white/chevron-right.svg</iconset>
                </property>
                <property name="iconSize">
                 <size>
@@ -236,7 +236,7 @@ border-radius: 15px;</string>
             </property>
             <property name="icon">
              <iconset>
-              <normaloff>sources/icons_white/plus.svg</normaloff>sources/icons_white/plus.svg</iconset>
+              <normaloff>../../../../.designer/backup/sources/icons_white/plus.svg</normaloff>../../../../.designer/backup/sources/icons_white/plus.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -381,7 +381,7 @@ QPushButton:checked {
                        </property>
                        <property name="icon">
                         <iconset>
-                         <normaloff>sources/icons_white/circle.svg</normaloff>sources/icons_white/circle.svg</iconset>
+                         <normaloff>../../../../.designer/backup/sources/icons_white/circle.svg</normaloff>../../../../.designer/backup/sources/icons_white/circle.svg</iconset>
                        </property>
                        <property name="iconSize">
                         <size>
@@ -1078,7 +1078,7 @@ border-top-right-radius: 0px;
                      </property>
                      <property name="icon">
                       <iconset>
-                       <normaloff>sources/icons_white/plus.svg</normaloff>sources/icons_white/plus.svg</iconset>
+                       <normaloff>../../../../.designer/backup/sources/icons_white/plus.svg</normaloff>../../../../.designer/backup/sources/icons_white/plus.svg</iconset>
                      </property>
                      <property name="iconSize">
                       <size>
@@ -1815,7 +1815,7 @@ border-top-right-radius: 0px;
                         </property>
                         <property name="icon">
                          <iconset>
-                          <normaloff>sources/icons_white/pencil.svg</normaloff>sources/icons_white/pencil.svg</iconset>
+                          <normaloff>../../../../.designer/backup/sources/icons_white/pencil.svg</normaloff>../../../../.designer/backup/sources/icons_white/pencil.svg</iconset>
                         </property>
                         <property name="iconSize">
                          <size>
@@ -1911,7 +1911,7 @@ background-color: rgb(40,40, 40);</string>
                        </property>
                        <property name="icon">
                         <iconset>
-                         <normaloff>sources/icons_white/flame.svg</normaloff>sources/icons_white/flame.svg</iconset>
+                         <normaloff>../../../../.designer/backup/sources/icons_white/flame.svg</normaloff>../../../../.designer/backup/sources/icons_white/flame.svg</iconset>
                        </property>
                        <property name="iconSize">
                         <size>
@@ -1965,7 +1965,7 @@ background-color: rgb(40,40, 40);</string>
                        </property>
                        <property name="icon">
                         <iconset>
-                         <normaloff>sources/icons_white/flame.svg</normaloff>sources/icons_white/flame.svg</iconset>
+                         <normaloff>../../../../.designer/backup/sources/icons_white/flame.svg</normaloff>../../../../.designer/backup/sources/icons_white/flame.svg</iconset>
                        </property>
                        <property name="iconSize">
                         <size>
@@ -2044,7 +2044,7 @@ border-radius: 15px;</string>
                   </property>
                   <property name="icon">
                    <iconset>
-                    <normaloff>sources/icons_white/trash.svg</normaloff>sources/icons_white/trash.svg</iconset>
+                    <normaloff>../../../../.designer/backup/sources/icons_white/trash.svg</normaloff>../../../../.designer/backup/sources/icons_white/trash.svg</iconset>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -2343,9 +2343,9 @@ border-radius: 15px;</string>
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-157</y>
+             <y>-1613</y>
              <width>1221</width>
-             <height>1765</height>
+             <height>2235</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -2436,7 +2436,44 @@ border-radius: 15px;</string>
              </widget>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="diff_layout" stretch="1,1">
+             <widget class="QWidget" name="categ_bar_widget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>450</height>
+               </size>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_16">
+               <item>
+                <widget class="QLabel" name="categ_bar_label">
+                 <property name="font">
+                  <font>
+                   <pointsize>20</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Tasks completed with theit category</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignmentFlag::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="categ_bar" native="true">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>350</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="diff_layout" stretch="1">
               <item>
                <widget class="QWidget" name="perc_task_widget" native="true">
                 <property name="styleSheet">
@@ -2471,8 +2508,18 @@ border-radius: 15px;</string>
                 </layout>
                </widget>
               </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="categ_layout" stretch="1,1">
               <item>
                <widget class="QWidget" name="diff_pie_widget" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>50</width>
+                  <height>0</height>
+                 </size>
+                </property>
                 <property name="styleSheet">
                  <string notr="true"/>
                 </property>
@@ -2496,45 +2543,7 @@ border-radius: 15px;</string>
                   <widget class="QWidget" name="diff_pie" native="true">
                    <property name="minimumSize">
                     <size>
-                     <width>0</width>
-                     <height>350</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="categ_layout" stretch="1,1">
-              <item>
-               <widget class="QWidget" name="categ_bar_widget" native="true">
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_16">
-                 <item>
-                  <widget class="QLabel" name="categ_bar_label">
-                   <property name="font">
-                    <font>
-                     <pointsize>20</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Tasks completed with theit category</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignmentFlag::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="categ_bar" native="true">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
+                     <width>50</width>
                      <height>350</height>
                     </size>
                    </property>
@@ -2903,7 +2912,7 @@ border-radius: 15px;</string>
                     </property>
                     <property name="icon">
                      <iconset>
-                      <normaloff>../../sources/icons_white/github.svg</normaloff>../../sources/icons_white/github.svg</iconset>
+                      <normaloff>../../../../sources/icons_white/github.svg</normaloff>../../../../sources/icons_white/github.svg</iconset>
                     </property>
                     <property name="iconSize">
                      <size>
@@ -2995,7 +3004,7 @@ border-radius: 100px;</string>
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap>sources/icons_white/user-round.svg</pixmap>
+                 <pixmap>../../../../.designer/backup/sources/icons_white/user-round.svg</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>true</bool>

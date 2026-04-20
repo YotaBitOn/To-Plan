@@ -14,7 +14,7 @@
         "December": 12
     },
     "cur_theme": "dark",
-    "cur_lang": "ua",
+    "cur_lang": "eng",
     "panel_pos": "North",
     "theme": {
         "dark": {
@@ -41,11 +41,16 @@
         "very_easy": "blue"
     },
     "palette": {
+        "pink": "255, 41, 522",
         "red": "211, 0, 0",
         "yellow": "209, 167, 0",
+        "orange": "255, 128, 0",
         "gold": "214, 150, 0",
         "green": "49, 255, 34",
         "blue": "0, 179, 255",
+        "dark-blue": "0, 0, 225",
+        "dark-green": "0, 225, 0",
+
         "white": "239, 239, 239",
         "pearl": "215, 215, 215",
         "sterling": "190, 190, 190",
@@ -61,5 +66,18 @@
         "meal": "utensils-crossed.svg",
         "education": "graduation-cap.svg",
         "job": "hand-coins.svg"
+    },
+
+    "categ_col": {
+        "sport":  "red",
+        "education": "dark-blue",
+        "social":  "yellow",
+        "chores": "orange",
+        "meal":  "green",
+        "hygiene": "pearl",
+        "work":  "red",
+        "mental": "pink",
+        "rest":  "blue",
+        "other": "light-gray"
     }
 }
