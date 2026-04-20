@@ -175,6 +175,67 @@ class MyPlot():
         self.chart.addSeries(categ_pie)
         self.chart.legend().setAlignment(Qt.AlignBottom)
 
+    def day_diff_ratio(self):
+        #self.setAxis()
+
+        if len(db_data) == 0:
+            return
+        used_dates = set()
+
+        day_diff_bar = QStackedBarSeries()
+
+        hash =  [[task[3], task[6]] for task in db_data]
+        hash = sorted(hash, key=lambda x: x[0]) #change to qdate
+        dates = sorted(list(set([h[0] for h in hash])))
+        print(dates)
+
+        bar_very_easy = QBarSet("very_easy")
+        bar_easy = QBarSet("easy")
+        bar_medium = QBarSet("medium")
+        bar_hard = QBarSet("hard")
+
+        color = data['diff_col']['very_easy']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_very_easy.setBrush(QColor(r, g, b))
+
+        color = data['diff_col']['easy']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_easy.setBrush(QColor(r, g, b))
+
+        color = data['diff_col']['medium']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_medium.setBrush(QColor(r, g, b))
+
+        color = data['diff_col']['hard']
+        r, g, b = map(int, data['palette'][color].split(','))
+        bar_hard.setBrush(QColor(r, g, b))
+
+
+        for date in dates:
+
+            very_easy_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'very_easy')))
+            easy_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'easy')))
+            medium_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'medium')))
+            hard_ammo = sum(1 for d in db_data if ((d[3] == date) and (d[6] == 'hard')))
+
+            bar_very_easy << very_easy_ammo
+            bar_easy << easy_ammo
+            bar_medium << medium_ammo
+            bar_hard << hard_ammo
+
+        day_diff_bar.append(bar_very_easy)
+        day_diff_bar.append(bar_easy)
+        day_diff_bar.append(bar_medium)
+        day_diff_bar.append(bar_hard)
+
+        self.chart.addSeries(day_diff_bar)
+
+        axis = QBarCategoryAxis()
+        axis.append(dates)
+        self.chart.addAxis(axis, Qt.AlignBottom)
+        day_diff_bar.attachAxis(axis)
+
+
     def pie_on_hovered(self, slice, state):
         slice.setExploded(state)
         slice.setLabelVisible(state)
