@@ -40,7 +40,10 @@ class MainWindow(QMainWindow):
     def setUI(self):
         self.ui.task_step_progress.setVisible(False)
         self.ui.task_info_stack.setVisible(False)
+        self.ui.choose_time_layout_2.setVisible(False)
 
+        self.ui.tabWidget.removeTab(4)
+        self.ui.tabWidget.removeTab(3)
         self.ui.tabWidget.setCurrentIndex(0)
 
         self.ui.theme_box.setCurrentText(data['cur_theme']) #!
